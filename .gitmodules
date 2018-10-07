@@ -1,0 +1,3 @@
+[submodule "graphhopper"]
+	path = .\\code\\graphhopper
+	url = https://github.com/klekih/graphhopper
