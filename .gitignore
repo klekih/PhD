@@ -1,0 +1,7 @@
+# ignore from papers
+papers/**/*.pdf
+papers/**/*.log
+papers/**/*.aux
+papers/**/*.fdb*
+papers/**/*.gz
+papers/**/*.fls
