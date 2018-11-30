@@ -11,20 +11,19 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{Command, analyse and data mining of a chromatograph during drilling operations
-}
+\title{Analyse and data mining of a chromatograph during drilling operations}
 
 \author{\IEEEauthorblockN{1\textsuperscript{st} Toma Becea}
-\IEEEauthorblockA{\textit{Automation and Computer Science Faculty} \\
-\textit{Technical University of Cluj-Napoca}\\
-Cluj-Napoca, Romania \\
-tomabecea@pm.me}
-\and
-\IEEEauthorblockN{2\textsuperscript{nd} Honoriu Vălean}
-\IEEEauthorblockA{\textit{Automation and Computer Science Faculty} \\
-\textit{Technical University of Cluj-Napoca}\\
-Cluj-Napoca, Romania \\
-Honoriu.Valean@aut.utcluj.ro}
+    \IEEEauthorblockA{\textit{Automation and Computer Science Faculty} \\
+    \textit{Technical University of Cluj-Napoca}\\
+            Cluj-Napoca, Romania \\
+            tomabecea@pm.me}
+    \and
+    \IEEEauthorblockN{2\textsuperscript{nd} Honoriu Vălean}
+    \IEEEauthorblockA{\textit{Automation and Computer Science Faculty} \\
+    \textit{Technical University of Cluj-Napoca}\\
+            Cluj-Napoca, Romania \\
+            Honoriu.Valean@aut.utcluj.ro}
 }
 
 \maketitle
@@ -46,17 +45,56 @@ chromatography, geology, mud-logging
     and then using this model to ensure the results accuracy.
 \section{chromatograph}
 
-\subsection{Construction}
+\subsection{Chromatography concepts}
 
-The IEEEtran class file is used to format your paper and style the text. All margins, 
-column widths, line spaces, and text fonts are prescribed; please do not 
-alter them. You may note peculiarities. For example, the head margin
-measures proportionately more than is customary. This measurement 
-and others are deliberate, using specifications that anticipate your paper 
-as one part of the entire proceedings, and not as an independent document. 
-Please do not revise any of the current designations.
+    Gas chromatography means to separate components such that they can be analyzed independently. To achive this a
+    separation column is used. A probe of gas, taken from drilling installation, is pushed through the column which
+    means that all components enter into it at the same time. The column is filled with carefully choosen particles,
+    whose type and size are competitive commercial advantages (and because this is not the object of the current paper,
+    their details will not be disclosed). The probe is pushed through the column using a bearing gas, usually hydrogen.
+    The probe has to make its way through the column's particles and because of the friction between them different
+    components will have different speeds with which they advance. Thus, the components are reaching the end of the 
+    column at different times. The time which is needed for a component to traverse the column is called retention time.
+    Figure 1 contains a representation of a column and how two components, A and B, enter into the column at the same
+    time but they exit at different times.
+    During the usual drilling operations geologist engineers are interested in certain components so that they can analyze
+    and predict the behavior of the gas or petrol reservoir. Those components are: methane (C1), ethane (C2), propane (C3),
+    n-butane (nC4), isobutane (iC4), neopentane (nC5), isopentane (iC5). The sum of all those components yields a number
+    called theoretical total gas. The probe is also analysed as a whole to find out the total gas. The ratio of those two
+    numbers is of paramount importance.
+    Among the details which can be find out using the analyses of those components are the quality of the gas or petrol
+    which is in the reservoir, the proximity of the reservoir or certain predictors important for drilling engineers, for
+    example, the danger of the entire reservoir to erupt.
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.5\textwidth]{column.png}
+        \caption{Gas separation column}
+    \end{figure}
+
+\subsection{Flame Ionisation Detector}
+
+    The components are slowly (or fast, depending on the performance of the chromatograph) pouring out of the column
+    into a detector called Flame Ionisation Detector or FID. Its role is to transform over the analyses time the quantity
+    of each component into voltage. This voltage is read by ADC boards and transmitted to a computer for further calculations.
+    Figure 2 shows the schematics of such a FID. Item 1 represents the separation column, item 2 represents suplimentary
+    gas supply, 3 represents hydrogen supply, 4 represents the lighter, 5 represents the collector electrode, 6 is the
+    polarizing electrode, 7 is the burner and 8 is the air supply.
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.5\textwidth]{fid.png}
+        \caption{Flame Ionisation Detector}
+    \end{figure}
+
+\subsection{Construction}
+    
+Following description will be brief one and it focuses only on what is important for this paper. The construction of a 
+chromatograph implies certain components to be glued together. 
+
 
 \subsection{Maintenance}
+
 
 \section{Mathematical model}
 Before you begin to format your paper, first write and save the content as a 
