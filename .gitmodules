@@ -1,5 +1,5 @@
 [submodule "graphhopper"]
-	path = /code/graphhopper
+	path = code/graphhopper
 	url = https://github.com/klekih/graphhopper
 [submodule "cityactor"]
 	path = code/cityactor
