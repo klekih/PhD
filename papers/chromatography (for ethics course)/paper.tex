@@ -112,7 +112,7 @@ chromatography, geology, mud-logging
 \subsection{Maintenance}
 
     A drilling site is filled with dust, the temperatures might drop below freezing for extended periods of time, the mud is
-    a constant and the mechanical load during transport from one site to another is a burden. Then there always might extended
+    a constant and the mechanical load during transport from one site to another is a burden. Then there always might be extended
     periods with no activity. 
 
     Therefore, the chromatograph must be easy to setup again, easy to start and easy to calibrate again because in time its 
@@ -135,7 +135,7 @@ chromatography, geology, mud-logging
 
     The mathematical model is so simple, one could wonder if it works at all: it's based on the least squares equation.
     From figure \ref{fig:fidgraph} it can be seen that during one minute of analyses the first two FIDs have some components present.
-    Using different rules for establishing a baseline the area of each componente (each "hill") is computed. This area is 
+    Using different rules for establishing a baseline the area of each component (each "hill") is computed. This area is 
     proportional with the amount of the component from the last probe analysed. The engineer who builds the chromatograph and then
     the engineer who maintain it will introduce, in consecutive analyses, different gases with a precisely known composition, using
     different concentrations. Thus, a series of analyses will be made, knowing for each one the calibrating gas composition and the
@@ -148,14 +148,14 @@ chromatography, geology, mud-logging
     corresponding component's concentrations from the lookup table. \(R\) will be the result of the current analyze.    
 
     \begin{equation}
-        R = \frac{C_n + C_{n+1}}{K_n + K_{n+1}}, K_{n} < R < K_{n+1}
+        R = \frac{C_n + C_{n+1}}{K_n + K_{n+1}}, K_{n} \leq R \leq K_{n+1}
         \label{eq:average}
     \end{equation}
 
     Another method for obtaining results using the data from the lookup table is to use the least squares method. Equation \ref{eq:leastSquares}
     shows the gist of this method. \(x_{1}\) through \(x_{n}\) are the known concentrations from calibration operation. \(y\) terms are
     the numerical integration results for a component, for each concentration. \(b\) terms are the coefficients which are found by 
-    solving the equation \ref{eq:leastSquares}. \(b\) will form a polynom which will be used during normal analyze mode to computed
+    solving the equation \ref{eq:leastSquares}. \(b\) terms will form a polynom which will be used during normal analyze mode to computed
     the real concentration of a component from a probe taken from the drilling site.
 
     \begin{equation}
