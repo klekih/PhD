@@ -55,7 +55,7 @@ chromatography, geology, mud-logging
     The probe has to make its way through the column's particles and because of the friction between them different
     components will have different speeds with which they advance. Thus, the components are reaching the end of the 
     column at different times. The time which is needed for a component to traverse the column is called retention time.
-    Figure 1 contains a representation of a column and how two components, A and B, enter into the column at the same
+    Figure \ref{fig:column} contains a representation of a column and how two components, A and B, enter into the column at the same
     time but they exit at different times.
     
     During the usual drilling operations geologist engineers are interested in certain components so that they can analyze
@@ -72,6 +72,7 @@ chromatography, geology, mud-logging
         \centering
         \includegraphics[width=0.5\textwidth]{column.png}
         \caption{Gas separation column}
+        \label{fig:column}
     \end{figure}
 
 \subsection{Flame Ionisation Detector}
@@ -79,7 +80,7 @@ chromatography, geology, mud-logging
     The components are slowly (or fast, depending on the performance of the chromatograph) pouring out of the column
     into a detector called Flame Ionisation Detector or FID. Its role is to transform over the analyses time the quantity
     of each component into voltage. This voltage is read by ADC boards and transmitted to a computer for further calculations.
-    Figure 2 shows the schematics of such a FID. Item 1 represents the separation column, item 2 represents suplimentary
+    Figure \ref{fig:fid} shows the schematics of such a FID. Item 1 represents the separation column, item 2 represents suplimentary
     gas supply, 3 represents hydrogen supply, 4 represents the lighter, 5 represents the collector electrode, 6 is the
     polarizing electrode, 7 is the burner and 8 is the air supply.
 
@@ -87,6 +88,7 @@ chromatography, geology, mud-logging
         \centering
         \includegraphics[width=0.5\textwidth]{fid.png}
         \caption{Flame Ionisation Detector}
+        \label{fig:fid}
     \end{figure}
 
 \subsection{Construction}
@@ -122,13 +124,56 @@ chromatography, geology, mud-logging
     Both the construction side of a chromatograph and its maintenance makes the designer of this device to consciously design
     it for those situations.
 
-\section{Mathematical model}
-
     \begin{figure}
         \centering
         \includegraphics[width=0.5\textwidth]{fidgraph.png}
         \caption{FID Graph}
+        \label{fig:fidgraph}
     \end{figure}
+
+\section{Mathematical model}
+
+    The mathematical model is so simple, one could wonder if it works at all: it's based on the least squares equation.
+    From figure \ref{fig:fidgraph} it can be seen that during one minute of analyses the first two FIDs have some components present.
+    Using different rules for establishing a baseline the area of each componente (each "hill") is computed. This area is 
+    proportional with the amount of the component from the last probe analysed. The engineer who builds the chromatograph and then
+    the engineer who maintain it will introduce, in consecutive analyses, different gases with a precisely known composition, using
+    different concentrations. Thus, a series of analyses will be made, knowing for each one the calibrating gas composition and the
+    results. A look tabel is born from this operation.
+
+    During normal operations the look up tabel will be used to analyze gases from drilling site. To be able to give results for any
+    given concentration, for any given component, an interpolation is needed between two known points, using first two points or
+    using last two points. This kind of interpolation is very similar to an average between two numbers. Equation \ref{eq:average}
+    represents such an average: \(K_n\) and \(K_{n+1}\) are numerical integrations results and  \(C_n\) and \(C_{n+1}\) are
+    corresponding component's concentrations from the lookup table. \(R\) will be the result of the current analyze.    
+
+    \begin{equation}
+        R = \frac{C_n + C_{n+1}}{K_n + K_{n+1}}, K_{n} < R < K_{n+1}
+        \label{eq:average}
+    \end{equation}
+
+    Another method for obtaining results using the data from the lookup table is to use the least squares method. Equation \ref{eq:leastSquares}
+    shows the gist of this method. \(x_{1}\) through \(x_{n}\) are the known concentrations from calibration operation. \(y\) terms are
+    the numerical integration results for a component, for each concentration. \(b\) terms are the coefficients which are found by 
+    solving the equation \ref{eq:leastSquares}. \(b\) will form a polynom which will be used during normal analyze mode to computed
+    the real concentration of a component from a probe taken from the drilling site.
+
+    \begin{equation}
+        \begin{bmatrix}
+             x_0 \\ \vdots \\ x_{n} 
+         \end{bmatrix}
+             =
+         \begin{pmatrix}
+            y_{00} & \hdots & y_{0(m-1)} & y_{0m}\\
+            \vdots & & \vdots & \vdots \\
+            y_{n0} & \hdots & y_{n(m-1)} & y_{nm}
+            \end{pmatrix}
+            \times
+            \begin{pmatrix}
+            b_0 \\ \vdots \\ b_m
+        \end{pmatrix}
+        \label{eq:leastSquares}
+    \end{equation}
 
 
 \begin{thebibliography}{00}
