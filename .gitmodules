@@ -4,3 +4,6 @@
 [submodule "city"]
 	path = code/city
 	url = https://github.com/klekih/city
+[submodule "code/cityfront"]
+	path = code/cityfront
+	url = https://github.com/klekih/cityfront
