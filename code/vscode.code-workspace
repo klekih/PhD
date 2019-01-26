@@ -1,13 +1,13 @@
 {
 	"folders": [
 		{
-			"path": "cityactor"
-		},
-		{
 			"path": "graphhopper"
 		},
 		{
 			"path": "city"
+		},
+		{
+			"path": "cityfront"
 		}
 	],
 	"settings": {}
