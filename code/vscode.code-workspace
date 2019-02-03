@@ -10,5 +10,7 @@
 			"path": "cityfront"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "city"
+	}
 }
