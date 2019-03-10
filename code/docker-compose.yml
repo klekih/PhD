@@ -4,8 +4,10 @@ services:
   graphhopper:
     build: ./graphhopper
     ports:
-      - "8989:8989"
-  redis:
-    image: "redis:alpine"
+      - "8989:8989"  
+  citysim:
+    build: ./city/citysim
   cityactor:
-    build: ./cityactor
+    build: ./city/cityactor
+    depends_on: 
+      - "graphhopper"
