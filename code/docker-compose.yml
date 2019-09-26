@@ -2,7 +2,7 @@ version: '3'
 
 services:
   graphhopper:
-    build: ./graphhopper
+    image: tomabecea/graphhopper:latest
     ports:
       - "8989:8989"
   citysim:
