@@ -7,6 +7,8 @@ services:
       - "8989:8989"
   citysim:
     build: ./city/citysim
+    ports:
+      - "9000:9000"
   cityactor:
     build: ./city/cityactor
     depends_on: 
