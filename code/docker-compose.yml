@@ -13,6 +13,7 @@ services:
     build: ./city/cityactor
     depends_on: 
       - "graphhopper"
+    restart: always
   cityfront:
     build: ./cityfront
     ports:
