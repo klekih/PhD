@@ -1,5 +1,4 @@
 \documentclass[conference]{IEEEtran}
-\IEEEoverridecommandlockouts
 % The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
@@ -29,18 +28,39 @@ email address}
 \maketitle
 
 \begin{abstract}
-Simulating traffic in a city is a difficult task. Current paper is proposing a novel way using state of the art in distributed  microservices: orchestrating microservices. The desing is centered around two types of actors: a city simulation which keeps track of streets and cars densities. The other actor is the care which travels across the city.
+Simulating traffic in a city is a difficult task. Current paper is proposing a novel way using state of the art in distributed systems: orchestrating microservices. The design is centered around two types of actors: a city simulation actor (a single instance of it) which keeps track of occupied streets and and their gradual occupation. The other actor type (multiple instances) is the car which travels across the city.
 \end{abstract}
 
 \section{Introduction}
+Simulation of traffic in a given city has many benefits and applications. 
+
+(Terms definition)
 
 \section{Microservices}
 
-\subsection{Inception}
+\subsection{Current state}
+
+\subsection{Implementation}
+
+\section{Actors}
+
+\subsection{City simulation actor}
+(Reason)
+
+(Types of data held: lines and densities)
+
+(Future enhancements: integration into car actor for distributed consensus and data exchange)
+
+\subsection{Car actor}
+(Routing logic)
+
+\section{Orchestration}
 
 \subsection{Current state}
 
-\section{Orchestration}
+\subsection{Implementation}
+
+\subsection{Kubernetes}
 
 \section{Design}
 
@@ -50,13 +70,16 @@ Simulating traffic in a city is a difficult task. Current paper is proposing a n
 \item Docker
 \item Docker compose
 \item OpenSourceMap
+\item Graphhopper
+\item Web page choices (web page will become an actor)
 \end{itemize}
 
 \subsection{Choices and rationales}
 
 \subsection{Alternatives}
+(Actor model and consacrated frameworks)
 
-\subsection{Communication design}
+\subsection{Networking design}
 
 \subsection{Orchestration design}
 
@@ -66,7 +89,10 @@ Simulating traffic in a city is a difficult task. Current paper is proposing a n
 
 \subsection{Performance}
 
-\subsection{}
+\section{Enhancements}
+(Distributed database for multiple city simulators)
+
+(More granular logic on actor behavior)
 
 \begin{thebibliography}{00}
 \bibitem{b1} G. Eason, B. Noble, and I. N. Sneddon, ``On certain integrals of Lipschitz-Hankel type involving products of Bessel functions,'' Phil. Trans. Roy. Soc. London, vol. A247, pp. 529--551, April 1955.
