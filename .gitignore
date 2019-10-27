@@ -5,3 +5,5 @@ papers/**/*.aux
 papers/**/*.fdb*
 papers/**/*.gz
 papers/**/*.fls
+papers/**/*.bbl
+papers/**/*.blg
