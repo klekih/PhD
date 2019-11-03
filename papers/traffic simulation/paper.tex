@@ -95,7 +95,7 @@ The most common and easy solution to share data across all the city actors is to
 
 The density is defined as the number of actors (cars) which are at a given moment present on a given segment of street. If the city simulator has no entry of a street segment then it will consider the density as being 0, i.e. there is no actor on that street. The density is modeled as an unsigned integer.
 
-Figure \ref{fig:citysimrelations} depicts the city simulator in relation with the other entities. A notable exception is the web page. Its purpose is not to participate in the same information exchange the other have but to offer a visual interpretation of the way the city and the other actors are interacting with one another.
+Figure \ref{fig:citysimrelations} depicts the city simulator in relation with the other entities. A notable exception is the web page. Its purpose is not to participate in the same information exchange the other entities have but to offer a visual interpretation of the way the city and the other actors are interacting with one another.
 
 \begin{figure}
     \includegraphics[width=8cm]{CitySimulator.png}
@@ -119,7 +119,7 @@ As part of this proposal the city simulator is made to be a standalone entity (c
 
 \subsection{Car actor}
 
-The city actor represents a moving actor within a city. It can be a car which moves across the city, it can be a bike or it can be a pedestrian. Its naming suggests that it can be any entity or living being which moves within a city and interacts with the other entities or affects the other entities in some manner. A pedestrian would directly interact with other pedestrians but not with cars. A pedestrian would indirectly affect other cars by willing to walk over a crossing.
+The city actor represents a moving actor within a city. It can be a car which moves across the city, it can be a bike or it can be a pedestrian. Its naming suggests that it can be any entity or living being which moves within a city and interacts with the other entities or affects the other entities in some manner. A pedestrian would directly interact with other pedestrians but not with cars. A pedestrian would indirectly affect other cars by willing to walk over a street crossing.
 
 The implementation proposed here is aiming to model a single type of actor: a car which moves between two points across a city. Because the purpose of this paper is not to tackle maps representation and routing through a city (in itself, this area is way bigger than a mere technical paper) the city actor is using two notable services: Open Street Map \cite{openstreetmap} and GraphHopper \cite{graphhopper}. Open Street Map is an open source licensed map of the entire world. Graphhoper is an open source service which offers directions APIs and route planning. It can use Open Street Map as an underlying map provider. They provider free tiers and paid subscription for accessing an API and get routes. However, a city actor is not using any public api but a special crafted container which contains GraphHopper and an open street map embedded into it. Thus, this container is running in parallel with the other city actors and provides them with the routing API they need.
 
@@ -127,9 +127,13 @@ A first way to introduce randomness into the entire simulation of a city is to c
 
 \subsection{Interactions}
 
-An actor interacts, for the time being, with the city simulator by using a Go struct and a Go enum. They can be seen in listings \ref{lst:goactorstruct} and \ref{lst:goactorreports}.
+An actor interacts, for the time being, only with the city simulator by using a Go struct and a Go enum. They can be seen in listings \ref{lst:goactorstruct} and \ref{lst:goactorreports}. The message sent from one side to another has a general structure called \textit{Envelope}. It is meant to offer a top level message which can be serialized (or encoded, the way to do this in Golgang, if not gRPC, is the gob pacakge it offers out of the box) and passed around, enabling any party involved to understand what this message is about and how to decode it.
 
-\begin{lstlisting}[caption=Go struct for actor's report, label=lst:goactorreports]
+Listing \ref{lst:goenvelope} show the top level message. It contains a message type which instructs the reader what kind of message it has to deal with and the possible types are the second part of listing \ref{lst:goactorstruct}: \textit{SendReport}, \textit{AskForLine}, \textit{RespondWithLine}. Let's take them one by one. \textit{SendReport} represents a message sent from an actor to the city simulator and the \textit{Payload} contains the report seen in listing \ref{lst:goactorreports}. 
+
+\textit{AskForLine} is a message sent from an actor to the city simulator in which the actor asks about the density of any line. This way any actor can take conscious decisions on which route to go on when based on what lies ahead in terms of street densities. When a first route is known, between two desired points, the actor can ask about each line it has on that route. The city simulator will respond with the known density of it. If the actor desires, it can try to find another route by asking GraphHopper service to compute a new one but with an additional rule: avoid a certain point (street, junction, etc.). \textit{RespondWithLine} is the type of message which the city simulator sends back to an actor after it received an \textit{AskForLine} message.
+
+\begin{lstlisting}[caption=Go enumerations for messaging, label=lst:goactorreports]
 const (   
     // ReportOnTheLine is the report sent by one agent to
     // notify the city that he is currently advancing
@@ -157,7 +161,18 @@ const (
 )
 \end{lstlisting}
 
+\begin{lstlisting}[caption=Go top level struct (envelope), label=lst:goenvelope]
+// Envelope is the container for different messages sent back
+// and forth between an actor and a city
+type Envelope struct {
+    MessageType int
+    Payload     interface{}
+}
+\end{lstlisting}
+
 \section{Orchestration}
+
+The term orchestration means the handling of containers and microservices in order to bring coherence into their interaction. They have to run on multiple nodes (computers or virtual machines) and at the same time to communicate with one another. They need to be updated in place and without service disruption. Whenever one of them crash they have to restart as quickly as possible. They have to be able to discover themselves without dealing with intricancies of IP addresses, proxies, etc. They have to 
 
 \subsection{Current state}
 
