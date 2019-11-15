@@ -93,6 +93,7 @@ Thus, a container is a small set of processes which run in isolation. They allow
 To go to solution for building, manipulating and running images is Docker \citep{docker}. It allows easy software installation, it works cross platform and it offers a smooth experience most of the time.
 
 \subsection{City simulator}
+\label{subsection:citysimulator}
 
 The most common and easy solution to share data across all the city actors is to have a centralized store to keep it. City simulator acts as a centralized store for all other city actors. In the current implementation the city simulator keeps a set of data which can be described as a list of pairs, each pair having a line and a real number, called density.
 
@@ -186,6 +187,20 @@ As with every software project started from scratch there are a number of choice
 \subsection{Alternatives}
 (Actor model and consacrated frameworks)
 
+\begin{figure*}
+  \includegraphics[width=0.9\linewidth]{ScreenshotWebInterface.png}
+  \centering
+  \caption{Screenshot of the web interface showing the running simulation}
+  \label{fig:ScreenshotWebInterface}
+\end{figure*}
+
+\begin{figure*}
+  \includegraphics[width=0.9\linewidth]{ScreenshotWebInterface2.png}
+  \centering
+  \caption{Screenshot of the web interface showing the running simulation with a larger number of actors}
+  \label{fig:ScreenshotWebInterface2}
+\end{figure*}
+
 \section{Orchestration}
 \label{sec:orchestration}
 
@@ -236,6 +251,7 @@ Finally, to run this docker compose there is a simple command to bring everythin
 The other detail of running this set of containers is to scale up a specific service. In our case we would like to have more than one city actor. Therefore the command to run is \textit{\textbf{docker-compose up --scale cityactor=1001}}. This way one thousand and one city actors will be created. In combination with the option of always restarting a container which exits, the entire simulation will run virtually forever.
 
 \subsection{Kubernetes}
+\label{subsec:kubernetes}
 
 While the docker compose offers a basic set of functionalities to bootstrap our application, for a large number of city actors a single computer might not suffice. Here comes Kubernetes in play. Kubernetes \citep{Kubernetes} is an open-source system for automating deployment, scaling and management of containerized applications. It originates from Google and is their third approach on orchestrating microservices, as described in \cite{burns2016borg}.
 
@@ -254,9 +270,9 @@ Enter the DNS (Domain Name System), the backbone of the entire internet. In its 
 
 When many resources are needed, to serve a great number of users or to support a great number of city actors, a certain service might be so busy with serving data that the compute and memory resources it needs are greater than the hardware is able to give. Therefore it might be located at few addresses at the same time and any client which wants to access it should access the address where there are available compute and memory resources to serve its queries. Ideal would be to abstract or to decouple this information from the client and make it transparent for it. To do this the client needs to know only the service name and a certain "networking" entity should route its request to the appropiate available service. Such a entity could be a DNS authoritative server which, based on the load, availability and latency of the services will route the request to the appropiate node \citep{swildens2006scalable}.
 
-Docker and Kubernetes are doing a similar job. They offer a DNS service and according to the load of each node where a service run, a request is rooted to a node which will be able to respond to it. This logic is completely decoupled from the clients. Listings \ref{lst:gocityclientdial} and \ref{lst:cityfrontclientdial} shows how both the city front and a city actor calls the city simulator. All what they do is to use the address which was specified in the docker-compose file (listing \ref{lst:dockercompose}). Docker or Kubernetes will do the actual job to route the request to the appropiate node of the service.
+Docker and Kubernetes are doing a similar job. They offer a DNS service and according to the load of each node where a service run, a request is rooted to a node which will be able to respond to it. This logic is completely decoupled from the clients. Listings \ref{lst:gocityclientdial} and \ref{lst:cityfrontclientdial} shows how both the city front and a city actor calls the city simulator. All what they do is to use the address which was specified in the docker-compose file (listing \ref{lst:dockercompose}). Docker or Kubernetes will do the actual job to route the request to the appropiate node of the service. One thing to note is the difference between the two. A city client will communicate via TCP/IP using a Go language Glob format (add referenc to the design choices paragraph) while the city front use a WebSocket communication technology (add reference to the design choices paragraph) but both of them are transparently routed by Docker.
 
-\begin{lstlisting}[caption=City client dialing City simulator, label=lst:gocityclientdial]
+\begin{lstlisting}[caption=City actor dialing City simulator, label=lst:gocityclientdial]
 conn, err := net.Dial("tcp", "citysim:7450")
 if err != nil {
     fmt.Println("Error on dialing", err)
@@ -290,19 +306,26 @@ var startWebsocket = function (callback) {
 \section{Results}
 \label{sec:results}
 
-\subsection{Visual}
+Figure \ref{fig:ScreenshotWebInterface} shows a screenshot of the web interface discussed in paragraph \ref{subsection:citysimulator}, showing a simulation with less than 20 actors. The web interface is a simple, httml/js only web page (vanilla js) which connects to the city simulator as can be seen in listing \ref{lst:cityfrontclientdial}. The city simulator will send a notification the web page server each time the density changes for a certain line. It can be that a new or first actor entered a certain line (a list of coordinates which represent a street) or it can be that one or the last actor left a line. The web page will draw any line with a density greater than 0 on top of the map.
 
-\subsection{Performance}
+The map is sourced from Open Street Map \citep{openstreetmap} and is showing the map zoomed to a specific city, same used by the city actors in their walkings. Thus, whenever a city actor reports that it is traveling across a line and this information arrives at the web interface through the city simulator, the respective line will be immediately drawn into the view.
+
+A laptop used for simulating (MacBook Pro, 16 GB RAM, i5 3.1 GHz) is able to run easily 50 city actors. Above a certain threshold the bottleneck, surprisingly, is not the memory or the cpu but the way docker handles network interfaces. For a larger number of ciy actors a better tool must be used (see paragraph \ref{subsec:kubernetes}). Figure \ref{fig:ScreenshotWebInterface2} shows a simulation with 50 actors running at the same time through the city.
 
 \section{Enhancements}
 \label{sec:enhancements}
-(Distributed database for multiple city simulators)
 
-(More granular logic on actor behavior)
+As with all technicl projects, there are a number of enhacements which can be further developed around the concept of simulating a city traffic through actors running in microservices, as presented in this paper. This section will briefly propose few of those details in the following paragraphs.
 
-(More types of "junctions": classic junction for cars, pedestrian crossings, subways access stairs and elevators, bus stations, etc.)
+As the number of the actors are growing a first bottlneck in the current architecture will be the city simulator. It is a single entity and it represents a single source of truth for the actors. To keep it as single source of truth but at the same time to scale it horizontally means that we need to introduce few additional concepts. In \cite{6847479} a first idea might be of using multiple cloud providers for taking advantage of their available compute resources and also for combining them. This would serve both to the city simulator as well to the swarm of city actors. The other part which remains is to keep the city simulator as a single source of truth by taking advantage of a distributed database. Something similar can be seen in \cite{8509417} where a NoSQL database is used for horizontally scaling. To take advantage of the Kubernetes cluster there are similar horizontally scalable databases which can be built upon. One option is the distribute key-value store used by Kubernetes itself: Etcd datbase \citep{etcd}.
 
-(Contained actors: pedestrians in a bus, pedestrian in a subway)
+A second idea for enhancing the simulation is to make the actors to have a more granular and diverse logic of traversing the city. The solution proposed into this paper is a basic one: an actor has a route between two random points on the map and then it goes on to travel across that route. It can also be made to look for street densities in advance and act accordingly. If a street is too crowded the actor might choose to avoid it and compute a new route around it.
+
+A third idea is to add more interactions between actors. It has been discussed that a first interaction is and indirect one: the number of actors on a certain street, number called density. But there are many more points of interactions. Let's take junctions. The city simulator can model any junction and then it can permit actors to pass or not through it. Then there are pedestrian crossings where different types of actors can meet each other. Or subways access, elevators for them, bus stations, etc.
+
+A fourth idea is to have contained actors. A bus is an actor. A person is an actor. If a person is waiting on a bus station and then it takes a bus, there are two actors, but they are tied and are not independent anymore until the person choose to get out of the bus. This means the densities across sidewalkings and bus stations need to be computed accordingly.
+
+A fifth idea of enhancement is not tied to the way simulation is working but to how it is presented. The web page can display different colors based on the density of a line, offering a visual clue on it. Also it can easily show more information when the cursor is over a point of interest (a street, a junction, etc.).
 
 \bibliography{wiki}
 \vspace{12pt}
