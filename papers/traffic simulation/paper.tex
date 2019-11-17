@@ -43,7 +43,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \begin{document}
 
-\title{A microservices based approach for city traffic simulation}
+\title{A Microservices Based Approach for City Traffic Simulation}
 
 \author{\IEEEauthorblockN{1\textsuperscript{st} Toma Becea}
     \IEEEauthorblockA{\textit{Automation and Computer Science Faculty} \\
@@ -68,7 +68,7 @@ Simulating traffic in a city is a difficult task. Current paper is proposing a n
 
 \section{Introduction}
 
-A solution which simulates car, pedestrian, etc. traffic in a given city may reap many benefits. It can help understand patterns of traffic and its flow. It can help unerstand the particularities and pecularities of a city's streets arrangements. It can help identify bottlenecks. It can help find solutions to rush problems and explore them. But for those areas to be tackled, appropiate methods of simulating traffic must be found. We are proposing a novel way of simulating traffic based on the microservices orchestration concept.
+A solution which simulates car, pedestrian, etc. traffic in a given city may reap many benefits. It can help understand patterns of traffic and its flow. It can help unerstand the particularities and pecularities of a city's streets arrangements. It can help identify bottlenecks. It can help find solutions to rush problems and explore them. But for those areas to be tackled, appropiate methods of simulating traffic must be found. We are proposing a novel way of simulating traffic based on the microservices orchestration concept and using a discrete microscopic logic.
 
 We define a \textbf{(city) actor} as being a independent entity which chose to move between two geographical points within a city. It can be a car, a pedestrian or a bike. We also define the \textbf{city simulator} as being a single entity (subject to distributed and load balacing services) which keeps data about the city (e.g. streets with city actors on them).
 
@@ -77,7 +77,15 @@ This paper is structured in few sections. Section \ref{sec:existingsolutions} co
 \section{Existing solutions}
 \label{sec:existingsolutions}
 
-(Summary of other papers with traffic simulation)
+Existing solutions have a general distinction of being on a spectrum: macroscopic, mesoscopic or microscopic. This distinction is caused by how the traffic is modeled: on a macroscopic scale like streets or sections of a highway or on microscopic level, focusing on each car and its relation with neighbours. The relation between a car and its neighbours, can also be modeled as microscopic or nanoscopic.
+
+\cite{6973934} is describing a multiagent system for interactions between pedestrians and vehicles, where each pedestrian and vehicle is an intelligent agent with own personality and decisions. This idea is an interesting one especially because it is proposed as an enhacement to the solution presented by the current paper. In the same area of microscopic simulation we can see another proposal from \cite{7004985}. Of a great interest is their ability to feed back in the simulation the data gathered from loop detectors across the portion of highway they are particularly interested in.
+
+\cite{6205472} is probably the most viable approach as it is a complete simulation software. Based on the Ngel-Schreckenberg \citep{nagel-schreckenberg} automaton model of simulating a freeway traffic, P. Gora is advancing this idea into a fully fledged software simulation framework.
+
+In \cite{8569576} the broad idea is to us a discrete event architecture where there are logical processes for executing a number of agents. For a computation intensive those processes can be clustered into agent clusters with dependencies between them. The particularity of this proposal is that it crosses the boundaries of a single computing machine and pave a way to distribute the load and information across machines, with certain limitations and challenges.
+
+Finally, \cite{6244609} propose optimization computation for intersections (junctions) by using a microscopic approach towards data analysis. The proposal use a discrete and stochastic time step of simulation model, combined with Synchro, a signal timing optimization software.
 
 \section{Implementation}
 \label{sec:implementation}
@@ -88,7 +96,7 @@ The entities which are participating into a traffic simulation are called actors
 
 Microservices are not a new concept. The idea behind them has existed since Linux kernel has started to be enriched with a concept called namespaces \citep{wiki:linuxns}. This allows one set of processes to see one set of resources while another set of processes see another set of resources, where resources might be, but not limited to, process IDs, file names and network resources. Those linux kernel abilities form the base of containers.
 
-Thus, a container is a small set of processes which run in isolation. They allow packaging a linux distro, a set of libraries and skd and on top of those custom code. This forms an image, which is essentially a tar gzipped file. Once the build process of an image is finished, it can be spinned up in one or more running containers. The custom code written and embedded in the image is running in parallel in each container.
+Thus, a container is a small set of processes which run in isolation. They allow packaging a linux distro, a set of libraries and sdk and on top of those custom code. This forms an image, which is essentially a tar gzipped file. Once the build process of an image is finished, it can be spinned up in one or more running containers. The custom code written and embedded in the image is running in parallel in each container.
 
 To go to solution for building, manipulating and running images is Docker \citep{docker}. It allows easy software installation, it works cross platform and it offers a smooth experience most of the time.
 
@@ -177,15 +185,24 @@ type Envelope struct {
 \subsection{Design choices}
 \label{subsec:designchoices}
 
-As with every software project started from scratch there are a number of choices to make when choosing software stacks, programming languages, networking models, etc. This section is aiming to explore the rationale behind some of those decisions and how they influenced the final application of building such an application.
+As with every software project started from scratch there are a number of choices to make when choosing software stacks, programming languages, networking models, etc. This section is aiming to explore the rationale behind some of those decisions and how they influenced the building of  such an application.
 
-\begin{itemize}
-\item Go programming language
-\item Web page choices (web page will become an actor)
-\end{itemize}
+A first choice is the programming language to write both the city simulator and the city actor. Go programming langauge is born out of Google and it resembles the philosophy they were trying to embedded in it for taming the complexity of their systems \citep{donovan2015go}. Today it has gained a lot of popularity and tools like Kubernetes are wrritten entirely in Go, making it the default language of the cloud technologies. It is a "C-like" language and it has a familiar look but with few traits which makes it different. Out of those, few are notable, not only because they facilitate programming endeavors but also because both city simulator and city actor are modeled around them in their communications. 
 
-\subsection{Alternatives}
-(Actor model and consacrated frameworks)
+\begin{lstlisting}[caption=Go routine from city actor, label=lst:goroutine]
+go func() {
+	for {
+		select {
+		case <-ticker.C:
+			advance(city, reportChan, lineChan)
+		case _ = <-lineChan:
+			//fmt.Println("Received answer with line", j)
+		}
+	}
+}()
+\end{lstlisting}
+
+Go routines are a lightweight thread of executing. Being lightweight it means they can be easily started, with no overhead and especially without the ceremony of dealing with threads which other popular languages (e.g. Java) have. Listing \ref{lst:goroutine} shows such a routine. It is a part of logic where the city actor responds to either two events: the timer has expired and a decision has to be made or an information about the line is currently traveling on has been received from the city simulator. Another Go trait is the channels, an indexed communication pipe where there are asynchronous writers and readers, used to decouple two routines. Listing \ref{lst:goroutine} also shows couple of channels. Variables \textit{ticker} and \textit{lineChan} are two channels. They are declared using a type and after that they are used to write and read objects (or structs) of the respective type. Combined with the \textit{select} keyword, it becomes easy to write code which takes advantage of multithreading paradigms.
 
 \begin{figure*}
   \includegraphics[width=0.9\linewidth]{ScreenshotWebInterface.png}
