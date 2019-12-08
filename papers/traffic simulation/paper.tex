@@ -205,14 +205,14 @@ go func() {
 Go routines are a lightweight thread of executing. Being lightweight it means they can be easily started, with no overhead and especially without the ceremony of dealing with threads which other popular languages (e.g. Java) have. Listing \ref{lst:goroutine} shows such a routine. It is a part of logic where the city actor responds to either two events: the timer has expired and a decision needs to be made or an information about the line is currently traveling on has been received from the city simulator. Another Go trait is the channels, an indexed communication pipe where there are asynchronous writers and readers, used to decouple two routines. Listing \ref{lst:goroutine} also shows couple of channels. Variables \textit{ticker} and \textit{lineChan} are two channels. They are declared using a type and after that they are used to write and read objects (or structs) of the respective type. The \textit{select} keyword acts like a switch, not on variables and their values but on channels. It will execute the block of code for the channel which has something new to deliver. All those three concepts, \textit{goroutines}, \textit{channels} and \textit{select} switches, combined together makes it easy to write code which takes advantage of multithreading paradigms and which has to run in a heavy networking environment.
 
 \begin{figure*}
-  \includegraphics[width=0.9\linewidth]{ScreenshotWebInterface.png}
+  \includegraphics[width=0.9\linewidth]{ScreenshotWebInterface.jpg}
   \centering
   \caption{Screenshot of the web interface showing the running simulation}
   \label{fig:ScreenshotWebInterface}
 \end{figure*}
 
 \begin{figure*}
-  \includegraphics[width=0.9\linewidth]{ScreenshotWebInterface2.png}
+  \includegraphics[width=0.9\linewidth]{ScreenshotWebInterface2.jpg}
   \centering
   \caption{Screenshot of the web interface showing the running simulation with a larger number of actors}
   \label{fig:ScreenshotWebInterface2}
