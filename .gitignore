@@ -1,9 +1,11 @@
-# ignore from papers
-papers/**/*.pdf
-papers/**/*.log
-papers/**/*.aux
-papers/**/*.fdb*
-papers/**/*.gz
-papers/**/*.fls
-papers/**/*.bbl
-papers/**/*.blg
+# ignore latex temporary files
+**/*.DS_Store
+**/*.pdf
+**/*.log
+**/*.aux
+**/*.fdb*
+**/*.gz
+**/*.fls
+**/*.bbl
+**/*.blg
+.DS_Store
