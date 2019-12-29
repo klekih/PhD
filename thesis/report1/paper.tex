@@ -5,27 +5,32 @@
 
 \pagestyle{myheadings}
 
-\title{Opportunities on }
+\title{Analyzing opportunities arround city traffic optimization }
 \author{Toma Becea}
 
 \begin{document}
 
 \maketitle
 
-\chapter{Using different page styles}
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-
-\chapter{Sample Chapter}
-\thispagestyle{empty}
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
 \clearpage
 
-\section{New section}
+\section{Introduction}
 
-\Blindtext
+The traffic in a city is a very complex phenomenon. The parties involved are of many types: cars, pedestrians, buses, trams, taxi cabs (they are arugably cars, too but there might be small differences, e.g. they are allowed to drive on public transport lanes), bicycles, e-scooters (again, they are arguably same as bicycles), etc. Then there are rules on how they move: traffic lights for cars in junctions, across roads for pedestrian crossings, different traffic lights for buses and trams, etc. Within this rule-bounded context is the free will of every intelligent decision maker (it might be a human or it might be a self driving car with algorithms which we can deem as being intelligent from the perspective of behaving and moving within the traffic), the individual randomness unified into a collective orderness.
+
+But the devil is in the details: the orderness we see when looking across the entire city uncovers many opportunities. The architecture of many old cities is not meant for current traffic needs. The behavior of residents and dwellers of a city is not optimized for collective good but for personal comfort. The heterogenous and continous development of a city might add pain to the picture. Highly-accelerated developing areas or neighborhoods pose problems which city administrations are slow to understand and tackle with. Those, so far, are problems on the macro scale of a spectrum. On the other side of the spectrum, called micro, we can find another set of opportunities which can be modeled and analyzed through computer based simulations. Junction design, traffic lights programming and synchronization, pedestrian crossings and their influence on the surrounding driving lanes, bus stops and their influence, side walks design, lanes formation and one way drives, etc. Those are localized problems, focused on small geographical areas.
+
+The current chapter aim to find and define technical means on exploring intricacies within the traffic of a city. Software simulation is a broad term which encompasses any idea or way of using a computer to mimic as closely as possible a real phenomenon, with or without the help of a mathematical apparatus. This entire chapter is centered around various tehniques of using a computer for traffic simulation. There are a number of existing solutions to simulating traffic using software abilites, on various places on the macro-micro spectrum, as well as on other spectrums like discrete event vs continous simulation. Those will be explored and briefly categorized.
+
+\section{Abstract}
+
+The current chapter is aiming to propose a novel solution for simulating traffic in a city and exploring the opportunities which this solution makes possible to address. To describe it in few words, before going in full details on it on section \ref{sec:microservicesbasedapproachtrafficsim}, it is a discrete event based simulation, using a distributed microservices architecture where actors (defined as independent and intelligent participants in a traffic) are moving across a city and interacting with one another.
+
+The second area of this chapter is to analyze opportunities for optimizing the traffic within a city using the aforementioned simulation solution. Those ideas will revolve around the core concepts which form the foundation of the microservices base approach for traffic simulation: discrete and independent actors, decoupled in their logic and choice, interacting via discrete events based on their interest.
+
+\section{Current state of traffic simulation}
+
+\section{A microservices based approach for traffic simulation}
+\label{sec:microservicesbasedapproachtrafficsim}
 
 \end{document}
