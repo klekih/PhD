@@ -24,13 +24,26 @@ The current chapter aim to find and define technical means on exploring intricac
 
 \section{Abstract}
 
-The current chapter is aiming to propose a novel solution for simulating traffic in a city and exploring the opportunities which this solution makes possible to address. To describe it in few words, before going in full details on it on section \ref{sec:microservicesbasedapproachtrafficsim}, it is a discrete event based simulation, using a distributed microservices architecture where actors (defined as independent and intelligent participants in a traffic) are moving across a city and interacting with one another.
+The current chapter is aiming to propose a novel solution for simulating traffic in a city and exploring the opportunities which this solution makes possible to address. To describe it in few words, before going in full details on it during section \ref{sec:microservicesbasedapproachtrafficsim}, it is a discretes event based simulation, using a distributed microservices architecture where actors (defined as independent and intelligent participants in a traffic) are moving across a city and interacting with one another. They are a number of different instances running in isolation as containers. Their interaction is made via a single instance, called city simulator, which keep various statistics about the actors which are live and moving. On top of those there are few other supporting utilities, not essential for the current subject but mandatory for the simulation to run. They are a map and routing service which offers a route between two points of a city to those actors which need it and a service which renders a web page with the map of the city where the simulation takes place and the gradual occupation of its streets.
 
-The second area of this chapter is to analyze opportunities for optimizing the traffic within a city using the aforementioned simulation solution. Those ideas will revolve around the core concepts which form the foundation of the microservices base approach for traffic simulation: discrete and independent actors, decoupled in their logic and choice, interacting via discrete events based on their interest.
+The second area of this chapter is to analyze opportunities for optimizing the traffic within a city using the aforementioned simulation solution. Those ideas will revolve around the core concepts which form the foundation of the microservices based approach for traffic simulation: discrete and independent actors (also randomness is included into their behavior), decoupled in their logic and choice, interacting via discrete events based on their selfish interest (their behiavor which this simulation is modeled for is their interest in navigating their route as fast as they can, using the shortest path between two points, departure and arrival ones).
+
+Following concepts will be discussed in order to explore the opportunities for optimizing the traffic in a city. They are to be found in section \ref{sec:citytrafficoptimizations} and a brief list of them is presented here:
+
+\begin{itemize}
+    \item Modeling various actors with very different behaviors. For example a pedestrian and a city bus. Or a bicycle and a garbage truck.
+    \item Modeling various relations between different actors. An example of such a relation can be contained actors: a pedestrian can take a tram.
+    \item Introducing exception actors and their influence in the surrounding traffic. Firefighters truck is one example. Cars stopped on the road is another.
+    \item Localize hot areas or bottlenecks of a city: junctions, streets, cars stopped on the road.
+    \item Computation of various numbers and statistics. Few examples: average speed on street intervals, cars density per area and/or time, 
+\end{itemize}
 
 \section{Current state of traffic simulation}
 
 \section{A microservices based approach for traffic simulation}
 \label{sec:microservicesbasedapproachtrafficsim}
+
+\section{City traffic optimizations}
+\label{sec:citytrafficoptimizations}
 
 \end{document}
