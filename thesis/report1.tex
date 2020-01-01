@@ -2,7 +2,11 @@
 \usepackage[english]{babel}
 \usepackage{blindtext}
 \usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{apacite}
+\usepackage{natbib}
 
+\bibliographystyle{apacite}
 \pagestyle{myheadings}
 
 \title{Analyzing opportunities arround city traffic optimization }
@@ -33,9 +37,10 @@ Following concepts will be discussed in order to explore the opportunities for o
 \begin{itemize}
     \item Modeling various actors with very different behaviors. For example a pedestrian and a city bus. Or a bicycle and a garbage truck.
     \item Modeling various relations between different actors. An example of such a relation can be contained actors: a pedestrian can take a tram.
-    \item Introducing exception actors and their influence in the surrounding traffic. Firefighters truck is one example. Cars stopped on the road is another.
-    \item Localize hot areas or bottlenecks of a city: junctions, streets, cars stopped on the road.
-    \item Computation of various numbers and statistics. Few examples: average speed on street intervals, cars density per area and/or time, 
+    \item Introducing exception actors and their influence in the surrounding traffic. Firefighters truck moving throughout the city is one example. Cars stopped on the road is another.
+    \item Localize hot areas or bottlenecks of a city: junctions, streets, bridges.
+    \item Computation of various numbers and statistics. Few examples: average speed on street intervals, cars density per area and/or time.
+    \item Introduce geographical differences in simulation and study their influence: a roundabout instead of a junction, a new lane on a street.
 \end{itemize}
 
 \section{Current state of traffic simulation}
@@ -43,7 +48,52 @@ Following concepts will be discussed in order to explore the opportunities for o
 \section{A microservices based approach for traffic simulation}
 \label{sec:microservicesbasedapproachtrafficsim}
 
+\subsection{Prerequisites}
+\label{subsec:prerequisites}
+In order to discuss how a discrete-based, microservices architectured simulation works, few prerequisites are needed to set the base.
+
+First definition we need is for setting the fact that we are using geographical coordinate system. It doesn't matter which one, what it matters is that all actors are using the same set of geographical coordinates and same projection (or to know if there should be a conversion). For example, they could be EPSG:4326 or EPSG:3857. To define this in an appropiate way, equation \ref{eq:coordinates} will be used. Its loosness allow any implementation to treat coordinates using a built in language data type (e.g. \textit{double} in C\#).
+
+\begin{equation}
+\label{eq:coordinates}
+    C = \{ c | c \in \Re, c \geq 0 \}
+\end{equation}
+
+Simulation wise, actors do not have any \textit{intent}. They are just \textit{dumb} programs which need to be programmed to have any small \textit{intention}. To give them a \textit{sense} of selfishness they are programmed to navigate between two random points. Therefore points need to be defined as a pair of coordinates. The implementation of this will have to take care of their order or of knowing which one represents latitude and which one longitude. Equation \ref{eq:coordinatespair} defines such a pair of coordinates. Furthermore we define a way which introduce randomness into an actor's behavior: the random choice of two points. The actor needs to have two points predefined, $Pd_1$ and $Pd_2$. Those are treated as an aproximative rectangular area, out of which other two points will be randomly chosen: $Pr_1$ and $Pr_2$. Equation \ref{eq:funcrandom} defines this function, without entering into the details of how such a random function would work.
+
+\begin{equation}
+\label{eq:coordinatespair}
+    P = \{ (p1, p2) | p1 \in C, p2 \in C \}
+\end{equation}
+
+\begin{equation}
+\label{eq:funcrandom}
+\begin{split}
+    & f_{rand}: P \rightarrow P, \\
+    & f_{rand}(Pd_1, Pd_2) = rand (Pd_1, Pd_2) \Rightarrow (Pr_1, Pr_2)
+\end{split}
+\end{equation}
+
+So far an actor has two random points and now it needs a route. For this the final function we need to define as a prerquisite is in equation \ref{eq:funcroute}. Essentially this function takes two points, in this case the two random points obtained earlier, in equation \ref{eq:funcrandom}: $Pr_1$ and $Pr_2$ and outputs a series or a list of points where first point is the first random point, $Pr_1$ and last point is the second random point, $Pr_2$. Between them a number of points represents the path which the actor should follow in order to travel from its first (randomly choosen) point to its second (randomly choosen) point. Translated into a more intuitive description, those points are the instruction which any maps application outputs when asked for a route. For example OpenStreetMap, \cite{openstreetmap}.
+
+\begin{equation}
+\label{eq:funcroute}
+\begin{split}
+    & f_{route}: P \rightarrow [P], \\
+    & f_{route}(Pr_1, Pr_2) = route (Pr_1, Pr_2) \Rightarrow [Pr_1, Pc_1, Pc_2, ..., Pc_n, Pr_2]
+\end{split}
+\end{equation}
+
+\subsection{Microservices - city actor}
+
+Having defined the prerequisites from section \ref{subsec:prerequisites} we move on to present the first type of microservice from our architecture: the (city) actor. A city actor is meant to represent a specific behavior of an entity which moves across the city. To create such an actor it must be infused with specific behaviors based on the reality it wants to mimic. The prevalent example of this chapter will be a car. Therefore the prerequisites from section \ref{subsec:prerequisites} will suit a car's purpose to obtain a route using a predefined area where the car is allowed to wander. 
+
+\subsection{Microservices - city simulator}
+
+
 \section{City traffic optimizations}
 \label{sec:citytrafficoptimizations}
+
+\bibliography{wiki}
 
 \end{document}
