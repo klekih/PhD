@@ -5,6 +5,7 @@
 \usepackage{amsmath}
 \usepackage{apacite}
 \usepackage{natbib}
+\usepackage{listings}
 
 \bibliographystyle{apacite}
 \pagestyle{myheadings}
@@ -74,7 +75,7 @@ Simulation wise, actors do not have any \textit{intent}. They are just \textit{d
 \end{split}
 \end{equation}
 
-So far an actor has two random points and now it needs a route. For this the final function we need to define as a prerquisite is in equation \ref{eq:funcroute}. Essentially this function takes two points, in this case the two random points obtained earlier, in equation \ref{eq:funcrandom}: $Pr_1$ and $Pr_2$ and outputs a series or a list of points where first point is the first random point, $Pr_1$ and last point is the second random point, $Pr_2$. Between them a number of points represents the path which the actor should follow in order to travel from its first (randomly choosen) point to its second (randomly choosen) point. Translated into a more intuitive description, those points are the instruction which any maps application outputs when asked for a route. For example OpenStreetMap, \cite{openstreetmap}.
+So far an actor has two random points and now it needs a route. For this the final function we need to define as a prerquisite is in equation \ref{eq:funcroute}. Essentially this function takes two points, in this case the two random points obtained earlier, in equation \ref{eq:funcrandom}: $Pr_1$ and $Pr_2$ and outputs a series or a list of points where first point is the first random point, $Pr_1$ and last point is the second random point, $Pr_2$. Between them a number of points represents the path which the actor should follow in order to travel from its first (randomly choosen) point to its second (randomly choosen) point. Translated into a more intuitive description, those points are the instruction which any maps application outputs when asked for a route. For example OpenStreetMap, \cite{openstreetmap} is a map provider and Graphhopper, \cite{graphhopper} is a route provider which uses OpenStreetMap as the default map.
 
 \begin{equation}
 \label{eq:funcroute}
@@ -86,13 +87,45 @@ So far an actor has two random points and now it needs a route. For this the fin
 
 \subsection{Microservices - city actor}
 
-Having defined the prerequisites from section \ref{subsec:prerequisites} we move on to present the first type of microservice from our architecture: the (city) actor. A city actor is meant to represent a specific behavior of an entity which moves across the city. To create such an actor it must be infused with specific behaviors based on the reality it wants to mimic. The prevalent example of this chapter will be a car. Therefore the prerequisites from section \ref{subsec:prerequisites} will suit a car's purpose to obtain a route using a predefined area where the car is allowed to wander. 
+Having defined the prerequisites from section \ref{subsec:prerequisites} we move on to present the first type of microservice from our architecture: the (city) actor. A city actor is meant to represent a specific behavior of an entity which moves across the city. To create such an actor it must be infused with specific behaviors based on the reality it wants to mimic. The prevalent example of this chapter will be a car. Therefore the prerequisites from section \ref{subsec:prerequisites} will suit a car's purpose to obtain a route using a predefined area where the car is allowed to wander. To further isolate its movements and decisions an algorithm is supposed to be used at its core. Listing \ref{lst:caractoralgorithm} presents it.
+
+\begin{lstlisting}[caption=Basic algorithm for a car actor, label=lst:caractoralgorithm]
+\\ Get two random points
+(pr1, pr2) = rand (pd1, pd2)
+\\ Get the route
+R = route (pr1, pr2)
+\\ Set the position to the first point
+P my_position = pr1
+int index = 0
+while (index < R.length) {
+    int speed_coeff = get_info(R[index])
+    my_position = advance(speed_coeff, R, index)
+    report(my_position)
+}
+\\ Report that the route has been finished
+report(no_position)
+\end{lstlisting}
+
+Few remarks about the core algorithm showed in listing \ref{lst:caractoralgorithm}. There are few pieces which are missing from the prerequisites but are discussed into section \ref{subsec:citysimulator} because they are related to the communications between a car actor and the city simulator. Those pieces are the calls to following methods: \textit{get\_info} and \textit{report}. The third one, \textit{advance} is the place where each actor is going to be personalized with own rules and behavior. Those aspects will be discussed into the subsection \ref{subsec:actordiffbehaviors}.
+
+The core algorithm needs to be run on continuosly basis, with a standard frequency (e.g. 500 ms). Varying this number, also called simulation step can be an option for speeding or slowing the simulation running time. The \textit{advance} method is supposed to compute where to go next and it is responsible for incorporating the \textit{speed\_coeff} coefficient obtained from the city simulator. This coefficient is meant to express the density of cars on the street (if the actor which needs it is a car. In the case where it is a pedestrian the coefficient will be different. This way it is intuitively described the fact that a pedestrian walking on the sidewalk has nothing to do with the cars which are driving on near lanes and viceversa, a car driving on some lane doesn't care how many pedestrians are on the sidewalk near it) and it varies from expressing a totally free road to a road blocked by the numbers of cars waiting to pass through a junction.
+
+A written, more expansive description of this algorithm is as follows. For easier following of the simulation and for the current paper all actors are bounded to a certain area, expressed as two defined points $Pd_1$ and $Pd_2$. Those points are treated as the opposing corners of a rectangle and another two random points are chosen such that they are wihtin the rectangle: $Pr_1$ and $Pr_2$. The actor will then proceed to obtain a route, from another service, in order to know how to travel from $Pr_1$ to $Pr_2$. The route obtained is a series of another points, $Pc_1$ tp $Pc_n$, starting from $Pr_1$, called departure point, right to the finish point: $Pr_2$. They can be organized into subsets. A subset is a number of consecutive points which are treated as one instruction. Those instructions are meant to offer an easier guide, vocal or visual, for a human traveler. However, there are no human travelers into the simulation so the instructions have found another useful role. Usually an instruction is a limited length of a street during which the traveler doesn't need to do any change of direction. As soon as a junction must be traveled, there will be another instruction. Therefore this subset of the entire vector of points will become the interval which the actor reports as being traveling on to the city simulator. The city simulator, having such reports from all actors, will respond with the a number called speed coefficient, which reflects how many other actors are on the same interval and it will influence the traveling speed. The $advance$ method is meant to compute how the actor will advance and is the main place, though not the only one, where the behavior of different types of actors will be implemented. This method also takes care of handling the speed coefficient. Once the method computes the next position where the actor will be, that position will be reported back to the city simulator. This logic repeats itself as long as the actor has points and instructions which haven't been traveled yet. At last, the actor will report that it has been finished its route so that the city simulator will take into account one less actor.
 
 \subsection{Microservices - city simulator}
+\label{subsec:citysimulator}
 
+In this first chapter the city simulator is a separate entity which takes care of all the reports the actors send to it and also respond with every query about a certain route. Thus, it will need a 
+
+Speed coefficient
+
+\subsection{Implementation}
 
 \section{City traffic optimizations}
 \label{sec:citytrafficoptimizations}
+
+\subsection{Actor with different behaviors}
+\label{subsec:actordiffbehaviors}
 
 \bibliography{wiki}
 
