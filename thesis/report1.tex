@@ -115,11 +115,23 @@ A written, more expansive description of this algorithm is as follows. For easie
 \subsection{Microservices - city simulator}
 \label{subsec:citysimulator}
 
-In this first chapter the city simulator is a separate entity which takes care of all the reports the actors send to it and also respond with every query about a certain route. Thus, it will need a 
+In this first chapter the city simulator is a separate entity which takes care of all the reports the actors send to it and also respond with every query about a certain route. Thus, it will need a way to keep this data. There are few assumptions around this which need to be taken into consideration:
 
-Speed coefficient
+\begin{itemize}
+    \item The set of points $P$ represents routes whose interpretation are portions of streets;
+    \item A report sent by an actor contains a set of points and an indication if the actor is currently travelling on that route or if it went off it;
+    \item A set of points which was received from an actor can be a subset of another set of points received earlier from another actor;
+    \item A set of points which was received from an actor can be a superset of another set of points received earlier from another actor;
+    \item An actor can ask various information for any set of points it needs;
+    \item Any information which will be conveyed to an actor must take into account any subset and superset which might already exist;
+    \item An actor will send in each report an piece of information representing its type (car, person, etc.);
+\end{itemize}
+
+To illustrate above points the speed coefficient will be discussed. The first and uttermost information which an actor needs is representing the concentration of other actors of its type which around it or on a certain piece of road. For example, a car needs to know how many cars are around it, to know how fast it can advance. Or it might need to know how many cars are on a certain piece of road to asses if it can find a faster route. While the latter example is an intuitive one the former needs a little more explanation. Being a simulation, an actor doesn't know how many other actors are around it. In a real scenario the driver just have to look around but here there are no drivers and no looking around. One solution is for an actor to ask the city simulator how many other actors of its type are on the same street it's currently traveling on. Therefore, this information will need to be baked in the each actor type. For example a car will need to adjust its nominal speed with the coefficient which it received from the city simulator.
 
 \subsection{Implementation}
+
+
 
 \section{City traffic optimizations}
 \label{sec:citytrafficoptimizations}
