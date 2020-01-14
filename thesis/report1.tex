@@ -131,13 +131,19 @@ To illustrate above points the speed coefficient will be discussed. The first an
 
 \subsection{Implementation}
 
+The following implementation discuss the solution chosen by the authors in \cite{microservicestrafficsimulation}.
 
+First, a brief and high level view for few of the terms which will be used henceforth. A \textbf{microservice} is small and contained application, embedded into a tar file which contains everything it needs to run by itself. Moving tar files (called images) and running an image multiple times on the same machine gives a greater flexibility in developing and deploying application where the nature of distributin and scaling matters. A \textbf{container} is a running image. \textbf{Docker} \citep{docker} is a commercial (with free tier offers) for building, manipulating and running containers with limited functionality on the running side.
+
+Each actor type and the city simulators are an image. When they run, they become containers. Thus a simulation with hundreds of actors of car type needs only one image, that of a car actor. On top of this the second image comes into play: this is different and its called city simulator. It will run only as one instance or one container. The running environment, called Docker, will take care of running those two images and any other which are needed. Docker also offers a running environment where the containers can see each other through assigned names. When defining a running instance of type city simulator it can be specified that its name is \textit{citysimulator}. Docker will take care of providing a DNS-like experience for finding where this instance is running. Any other container which wants to talk to the \textit{citysimulator} will just use its name into the URL it wants to access (provided that the )
 
 \section{City traffic optimizations}
 \label{sec:citytrafficoptimizations}
 
-\subsection{Actor with different behaviors}
+\subsection{Actors with different behaviors}
 \label{subsec:actordiffbehaviors}
+
+\subsection{Analyzers}
 
 \bibliography{wiki}
 
