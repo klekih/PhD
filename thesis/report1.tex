@@ -86,6 +86,7 @@ So far an actor has two random points and now it needs a route. For this the fin
 \end{equation}
 
 \subsection{Microservices - city actor}
+\label{subsec:cityactor}
 
 Having defined the prerequisites from section \ref{subsec:prerequisites} we move on to present the first type of microservice from our architecture: the (city) actor. A city actor is meant to represent a specific behavior of an entity which moves across the city. To create such an actor it must be infused with specific behaviors based on the reality it wants to mimic. The prevalent example of this chapter will be a car. Therefore the prerequisites from section \ref{subsec:prerequisites} will suit a car's purpose to obtain a route using a predefined area where the car is allowed to wander. To further isolate its movements and decisions an algorithm is supposed to be used at its core. Listing \ref{lst:caractoralgorithm} presents it.
 
@@ -131,11 +132,13 @@ To illustrate above points the speed coefficient will be discussed. The first an
 
 \subsection{Implementation}
 
-The following implementation discuss the solution chosen by the authors in \cite{microservicestrafficsimulation}.
+The following implementation briefly presents the solution chosen by the authors in \cite{microservicestrafficsimulation}.
 
 First, a brief and high level view for few of the terms which will be used henceforth. A \textbf{microservice} is small and contained application, embedded into a tar file which contains everything it needs to run by itself. Moving tar files (called images) and running an image multiple times on the same machine gives a greater flexibility in developing and deploying application where the nature of distributin and scaling matters. A \textbf{container} is a running image. \textbf{Docker} \citep{docker} is a commercial (with free tier offers) for building, manipulating and running containers with limited functionality on the running side.
 
-Each actor type and the city simulators are an image. When they run, they become containers. Thus a simulation with hundreds of actors of car type needs only one image, that of a car actor. On top of this the second image comes into play: this is different and its called city simulator. It will run only as one instance or one container. The running environment, called Docker, will take care of running those two images and any other which are needed. Docker also offers a running environment where the containers can see each other through assigned names. When defining a running instance of type city simulator it can be specified that its name is \textit{citysimulator}. Docker will take care of providing a DNS-like experience for finding where this instance is running. Any other container which wants to talk to the \textit{citysimulator} will just use its name into the URL it wants to access (provided that the )
+Each actor type and the city simulators are an image. When they run, they become containers. Thus a simulation with hundreds of actors of car type needs only one image, that of a car actor. On top of this the second image comes into play: this is different and its called city simulator. It will run only as one instance or one container. The running environment, called Docker, will take care of running those two images and any other which are needed. Docker also offers a running environment where the containers can see each other through assigned names. When defining a running instance of type city simulator it can be specified that its name is \textit{citysimulator}. Docker will take care of providing a DNS-like experience for finding where this instance is running. Any other container which wants to talk to the \textit{citysimulator} will just use its name into the URL it wants to access (provided that the type of communications are REST APIs). Thus the easiness in use for container to container communications removes many frictions and smooths activities such as architecting a software application or developing it.
+
+Beyond the two images, those of a city car actor and a city simulator, two others are needed for the simulation to actually take place. One of them is a routing engine. It uses an underlying map, taken from Open Street Map \citep{openstreetmap}. The routing engine itself is called Graphhoper \citep{graphhopper} and offers routing services like finding the best (shortest) route between two points while at the same time providing useful options like computing the routing with the avoidance of a certain point (useful for actors which would like to avoid a too crowded street). The other image used is a web server which sources its data from the city simulator instance and presents a map where a human user can see the live simulation of the city.
 
 \section{City traffic optimizations}
 \label{sec:citytrafficoptimizations}
@@ -143,7 +146,36 @@ Each actor type and the city simulators are an image. When they run, they become
 \subsection{Actors with different behaviors}
 \label{subsec:actordiffbehaviors}
 
+One good opportunity for studying the traffic in a city is to model different actor types, each with different behaviors and travel rules. They all share same common goal: travel a route in as little time as possible. But the means of traveling (car, bus, pedestrian, etc.) and the rules (junctions, sidewalks, stop signs, bus lanes, bicycle lanes, etc.) are different for each of them. Therefore the interaction between them start to be complex in modeling via macro-mathematical means. Three examples are discussed in more detail:
+
+\paragraph{Cars} They are the default example of the current chapter. Their behavior is described in subsection \ref{subsec:citysimulator} and is presented here only as a comparison member for the other examples.
+\paragraph{Pedestrians} \label{par:pedestrians} They differ drastically from the cars in few aspects. First is the fact that they do not share same space of a street. From the perspective of a city simulator this means that it needs to know the actor type and it needs to maintain a separate zone of density information. The second aspect is that, altough, the pedestrian are by default walking on bare foots along streets, they might take public transport or taxis to travel between their points of interests. This has to be reflected into their routing algorithms. The other part of this aspect is discussed in subsection \ref{subsec:relationsbetweenactors}.
+\paragraph{Buses} Those are the same as cars but they have a fixed travel route to move across. Also they might share same lanes with cars or they might have different lanes. Thus the city simulator needs to know this actor type too and it needs to know where on the map they have special public transport lanes, to keep appropiate density numbers for them.
+\paragraph{Bicycles} The interesting particularity of those are the fact that they can limit the speed of other actors (cars or buses) to their speed on the places where overtaking is not possible. Again, this is one more burden for the city simulator because it needs to know where bicycles are and it needs to know which streets are too narrow.
+
+\subsection{Relations between actors}
+\label{subsec:relationsbetweenactors}
+
+\paragraph{Driving rules} Those are probably the most common interactions between actors. They interact with one another, regardless of their type, through the way a city works. Such a relation might be modeled by a junction or roundabout. Or it might be a crosswalking. Therefore the city simulator, once again, need to take into account those details. Modeling a junction might not be an easy feat and most probably here lies one of the places where a discrete-computed approach is more difficult to define and implement than an analogic aproximation. The difference, altough stated in loosely defined terms is that the definition of density can be a function of the number of actors on a given street. This can be computed at any time (or, better yet, it is computed on every event which occurs. i.e. an actor reporting its state on or off a street). A junction, to the contrary, might be too dynamic to be easy modeled the same way. An aproximation of it is a coefficient based upon an actor is allowed to go through that junction and continue its journey. Whenever an actor reaches a junction its algorithm will have to compute its advance speed based not only on the density (or speed coefficient) number but also based on the junction coefficient. And, of course, the city simulator might choose to vary that very junction coefficient based on a number of factors such as how many cars are awaiting on a joined street (intuitively, as more and more cars are piling up around a junction, harder it is to pass through it).
+
+\paragraph{Contained actors}
+The paragraph \ref{subsec:actordiffbehaviors} discussed a type of actor called pedestrians. They might independent but also they might choose to take a bus from one point to another. We call this a contained actor. Thus its reporting will be enriched with one more detail: if is walking by itself or if its inside a bus or a subway. The city simulator will have to compute the densities accordingly for the street or sidewalk but also it might need to know how many pedestrians is a bus allowed to carry.
+
+\paragraph{Close-follow actors}
+The bicycle which pedals onto a bus lane might be holding up a bus behind it. Or a number of cars if it's on a common lane. Therefore the speed they have might not be the one which they have without a bike.
+
+\subsection{Exception situations}
+Various situations, altough exceptional, might have a big influence on the surround traffic. If a portion of a street is going under few heavy modifications then the traffic might not be allowed to flow through there. Or if a car is stopped on the lane with hazard lights on. Therefore the city simulator will have the opportunity to modify the speed coefficient. It might choose to make it difficult for traffic to pass through that area (if out of 4 lanes, two for each direction, only 2 are used, one for each direction) or it might choose to completely block the portion. It would be of great interest to see, in this case, how the traffic adapts itself to flow through other streets and how much pressure it puts on them, on a different situation than the usual one. The situation of a completely blocked street might also pose the idea of making it a pedestrian-only street and study the effect it would have on the car traffic.
+
 \subsection{Analyzers}
+
+The final part of this traffic simulation chapter is about the possibilities of analyzing pieces of the big picture. It is the supreme purpose of a traffic simulation, to be able to analyze how it works, what specific behaviors it exhibits, in order to find new means and ways of improving it.
+
+\paragraph{Hot areas}
+
+\paragraph{Statistics numbers}
+
+\paragraph{Geographical differences}
 
 \bibliography{wiki}
 
