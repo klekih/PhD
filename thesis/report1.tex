@@ -6,6 +6,7 @@
 \usepackage{apacite}
 \usepackage{natbib}
 \usepackage{listings}
+\usepackage{graphicx}
 
 \bibliographystyle{apacite}
 \pagestyle{myheadings}
@@ -140,6 +141,13 @@ Each actor type and the city simulators are an image. When they run, they become
 
 Beyond the two images, those of a city car actor and a city simulator, two others are needed for the simulation to actually take place. One of them is a routing engine. It uses an underlying map, taken from Open Street Map \citep{openstreetmap}. The routing engine itself is called Graphhoper \citep{graphhopper} and offers routing services like finding the best (shortest) route between two points while at the same time providing useful options like computing the routing with the avoidance of a certain point (useful for actors which would like to avoid a too crowded street). The other image used is a web server which sources its data from the city simulator instance and presents a map where a human user can see the live simulation of the city.
 
+\begin{figure*}
+    \includegraphics[width=0.9\linewidth]{ScreenshotWebInterface2.jpg}
+    \centering
+    \caption{Screenshot of the web interface showing the running simulation}
+    \label{fig:ScreenshotWebInterface2}
+  \end{figure*}
+
 \section{City traffic optimizations}
 \label{sec:citytrafficoptimizations}
 
@@ -171,7 +179,13 @@ Various situations, altough exceptional, might have a big influence on the surro
 
 The final part of this traffic simulation chapter is about the possibilities of analyzing pieces of the big picture. It is the supreme purpose of a traffic simulation, to be able to analyze how it works, what specific behaviors it exhibits, in order to find new means and ways of improving it.
 
+The central piece of those analyzers is the city simulator. It contains all the centralized data, from all its actors and it has a minimal API (Application Programming Interface) to serve this data. Actors are the first to consume it as they might need various pieces of information to wisely choose their track. A separate microservice may be the one which takes this data and analyzes it further. The reason for a separate microservice is the separation of concerns. The city simulator is responsible only for keeping together the data and serving it. Any other duty of transform, extrapolate, etc. is not its task to do.
+
+Therefore few ways of taking advantage of this data are described below. They are by no means exhaustive and represent only few places to start.
+
 \paragraph{Hot areas}
+
+Hot areas are defined as places or streets where traffic is pilling up more than in other areas. Intuitively
 
 \paragraph{Statistics numbers}
 
