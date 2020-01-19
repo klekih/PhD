@@ -45,7 +45,7 @@ Following concepts will be discussed in order to explore the opportunities for o
     \item Introduce geographical differences in simulation and study their influence: a roundabout instead of a junction, a new lane on a street.
 \end{itemize}
 
-\section{Current state of traffic simulation}
+%\section{Current state of traffic simulation}
 
 \section{A microservices based approach for traffic simulation}
 \label{sec:microservicesbasedapproachtrafficsim}
@@ -185,11 +185,15 @@ Therefore few ways of taking advantage of this data are described below. They ar
 
 \paragraph{Hot areas}
 
-Hot areas are defined as places or streets where traffic is pilling up more than in other areas. Figure \ref{fig:ScreenshotWebInterface2} \citep{microservicestrafficsimulation} shows such a analyze using visual cues: streets are colored with red where there cars on them. A slight implementation of this would be to color them gradually and proportional with how many cars are on a specific street. Therefore the human eye will have a better understanding. Other places which could be analyzed are junctions. Figure \ref{fig:ScreenshotWebInterface2} doesn't show how much load are on junctions or roundabouts but there is an opportunity to take adjacent numbers from the city simulator and compute how much cars are able to pass a certain junction.
+Hot areas are defined as places or streets where traffic is pilling up more than in other areas. Figure \ref{fig:ScreenshotWebInterface2} \citep{microservicestrafficsimulation} shows such a analyze using visual cues: streets are colored with red where there cars on them. A slight implementation of this would be to color them gradually and proportional with how many cars are on a specific street. Therefore the human eye will have a better understanding. Other places which could be analyzed are junctions. Figure \ref{fig:ScreenshotWebInterface2} doesn't show how much load are on junctions or roundabouts but there is an opportunity to take adjacent numbers from the city simulator and compute how much cars are able to pass a certain junction in a given time frame.
 
 \paragraph{Statistics numbers}
 
+Sourcing data from the city simulator can meet other necessities. For example the average speed on a street interval, within a given time interval during the day. This could show how much the traffic is slowing down or speeding up. The dynamics of a street or of a neighborhood can be studied in more detail and with greater accuracy. The cars density can be extrapolated and linked to the emissions they have and their impact on the city atmosphere. The density distribution over time could lead to a better understanding of how the traffic is piling up or down during the day. 
+
 \paragraph{Geographical differences}
+
+Another place where those kind of simulation can be helpful is to study would-be differences in the geography of the city. A junction can be replaced with a roundabout and based on the extrapolated data from the other roundabouts of the city it can be studied what impact this modification might have. There are other modifications which can undergo the same study treatment. One would be to add a new lane or, conversely, to remove a lane and make it for public transport only. A street can be closed to study its impact on the surrounding streets and asses whether a temporary closing is possible or not. Or if it's possible to make it a street only for pedestrians. Or to make it one way. Those are things which can be studied before actual modifications of them and without disturbing a highly loaded city neighborhood.
 
 \bibliography{wiki}
 
