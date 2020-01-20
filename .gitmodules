@@ -1,9 +1,9 @@
 [submodule "graphhopper"]
-	path = code/graphhopper
+	path = code/citysim/graphhopper
 	url = https://github.com/klekih/graphhopper
 [submodule "city"]
-	path = code/city
+	path = code/citysim/city
 	url = https://github.com/klekih/city
 [submodule "code/cityfront"]
-	path = code/cityfront
+	path = code/citysim/cityfront
 	url = https://github.com/klekih/cityfront
