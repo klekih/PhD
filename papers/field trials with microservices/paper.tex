@@ -59,9 +59,11 @@
 \section{Solution}
 
 \subsection{Microservices and orchestration}
-    Microservices are the state of the art for designing new data and traffic intensive applications, while at the same time taking advantage of few mandatory issues revolving around today's challenges \cite{}: security is paramount and isolation and appropiate permissions for them (e.g. no 'sudo' user running code in a container) are an attractive concept. They enable architecture granularity which solves few challenges around Conway's law ("organizations which design systems ... are constrained to produce designs which are copies of the communication structures of these organizations" \cite{b4}). They advertise and mostly provide identical environments for both development and production. They package code and together with a wise package manager (e.g. Node Package Manager or NuGet) they solve the dependency hell and, sometimes, the tight coupling with the host OS (which still exists but is contained in the container as its definition, not anymore a host OS prerequisite). They also provides easier orchestration and elasticity in demand and configuration. However, as much as they are advertised as the ultimate architectural solution, there are cases when different architecture paradigms are better. One example would be monoliths (altough they are greatly blamed by the proponents of microservices) and another one could be actor model.
+    Microservices are the state of the art for designing new data and traffic intensive applications, while at the same time taking advantage of few mandatory issues revolving around today's challenges \cite{b5}: security is paramount and isolation and appropiate permissions for them (e.g. no 'sudo' user running code in a container) are an attractive concept. They enable architecture granularity which solves few challenges around Conway's law ("organizations which design systems ... are constrained to produce designs which are copies of the communication structures of these organizations" \cite{b4}). They advertise and mostly provide identical environments for both development and production. They package code and together with a wise package manager (e.g. Node Package Manager or NuGet) they solve the dependency hell and, sometimes, the tight coupling with the host OS (which still exists but is contained in the container as its definition, not anymore a host OS prerequisite). They also provides easier orchestration and elasticity in demand and configuration. However, as much as they are advertised as the ultimate architectural solution, there are cases when different architecture paradigms are better. One example would be monoliths \cite{b6} (altough they are greatly blamed by the proponents of microservices) and another one could be actor model \cite{b7}.
 
+    One can quickly start and use any microservice type approach towards a software solution. Any proof of concept is feasible and doable within minutes with all the open source generally available images for various products (databases, APIs, etc.). However upon doing a commercially viable product or a solution whose complexity is bigger, the first and uttermost problem is the handling of containers. This includes their lifetime, communications between them or with outer entities, persistence, updates, failure resilience, etc. The term "orchestration" sums up all those various operations.
     
+    The defacto solution for building and starting containers is Docker \cite{b8}. It also offers a simple orchestrator called Docker Compose, meant to run on a single computer. Its enterprise offerings contain Docker Swarm, a much more capable orchestrator. The current paper, however, will rely on the most ubiquitous solution of today's distributed systems world: Kubernetes \cite{b9}. More details on this, in subsection \ref{subsec:kube}.
 
     % \begin{figure}
     %     \centering
@@ -71,6 +73,11 @@
     % \end{figure}
 
 \subsection{Kubernetes}
+\label{subsec:kube}
+
+    Kubernetes stems from Google and has grown on the experience and challenges Google faced while building and maintaining their services, after two other closed sourced were build and used: Borg and Omega \cite{b9}. Kubernetes is open source and is not anymore managed by Google but by a foundation they have spinned up to oversee Kubernetes (and now they have hundreds of open source solutions in their landscape), called Cloud Native Computing Foundation or CNCF \cite{b11}.
+
+    
 
 \subsection{Service meshes}
 
@@ -86,7 +93,19 @@
 
     \bibitem{b4} M. Conway, \href{https://en.wikipedia.org/wiki/Conway%27s_law}{Wikpedia, Conway's law page}
 
-    \bibitem{b5} Thönes, Johannes. "Microservices." IEEE software 32.1 (2015): 116-116.
+    \bibitem{b5} Thones, Johannes. "Microservices." IEEE software 32.1 (2015): 116-116.
+
+    \bibitem{b6} Villamizar, Mario, et al. "Evaluating the monolithic and the microservice architecture pattern to deploy web applications in the cloud." 2015 10th Computing Colombian Conference (10CCC). IEEE, 2015.
+
+    \bibitem{b7} Sheikh, Hammad, Ángel Gómez, and Scott Atran. "Empirical evidence for the devoted actor model." Current Anthropology 57.S13 (2016): S204-S209.
+
+    \bibitem{b8} Docker. \href{https://www.docker.com}{Docker website}
+
+    \bibitem{b9} Kubernetes. \href{https://kubernetes.io}{Kubernetes website}
+
+    \bibitem{b10} Burns, Brendan, et al. "Borg, omega, and kubernetes." Queue 14.1 (2016): 70-93.
+
+    \bibitem{b11} CNCF. \href{https://www.cncf.io}{CNCF website}
 \end{thebibliography}
 \vspace{12pt}
 
