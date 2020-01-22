@@ -65,23 +65,87 @@
     
     The defacto solution for building and starting containers is Docker \cite{b8}. It also offers a simple orchestrator called Docker Compose, meant to run on a single computer. Its enterprise offerings contain Docker Swarm, a much more capable orchestrator. The current paper, however, will rely on the most ubiquitous solution of today's distributed systems world: Kubernetes \cite{b9}. More details on this, in subsection \ref{subsec:kube}.
 
-    % \begin{figure}
-    %     \centering
-    %     \includegraphics[width=0.5\textwidth]{column.png}
-    %     \caption{Gas separation column}
-    %     \label{fig:column}
-    % \end{figure}
-
 \subsection{Kubernetes}
 \label{subsec:kube}
 
     Kubernetes stems from Google and has grown on the experience and challenges Google faced while building and maintaining their services, after two other closed sourced were build and used: Borg and Omega \cite{b9}. Kubernetes is open source and is not anymore managed by Google but by a foundation they have spinned up to oversee Kubernetes (and now they have hundreds of open source solutions in their landscape), called Cloud Native Computing Foundation or CNCF \cite{b11}.
 
-    
+    Its offerings are overwhelming, both in their number and in their complexity. On top of them the third party offerings are intimidating at least. For the current paper only a handful of them will be described.
 
-\subsection{Service meshes}
+    Taken in a good order for understanding, the first item to discuss is to asses the microservices concept into Kubernetes context. Being made for orchestrating microservices is itself a collection of various microservices. (The details of its fabric are out of our scope). Therefore whatever it is to run by Kubernetes it has to be an image which became one or more pods (or containers). On top of this we need to know there is a service which knows about all pods of a certain type and expose their ports to outer (within same Kubernetes cluster or outside of it) clients. This service is also an abstraction on top of replicated pods, where it can load balance the traffic or route only to the pods which are healthy. Besides services (and their underpart called deployments) there are many other concepts which are having a play: ingresses, config maps, secrets, replicas, etc.
+
+    The final part for this puzzle we need is the pod mechanics. A pod is the base unit in Kubernetes and it might contain one or more containers. In practice there is a main container which is serving some business logic functionality and all the others, "supporting" containers, are called sidecars. For the current's subject the single piece of interplay between a container and a sidecar, within a pod, is to know the existence of Linux namespaces, specifically of network namespaces \cite{b12}. This functionality allows for a sidecar to hijack the communications of a container, using iptables \cite{b13}, in a transparent manner for the container, i.e. the container do not know that its communications are proxied via a sidecar. In practice this allows for a developer or a devops person to use a self made container with the business functionality it needs, while at the same time to use a third party product for inserting proxy or proxy-based functionalities.
+
+\subsection{Service mesh}
+
+    The high reliance on communications between many microservices has quickly became a friction regarding several aspects. The operational cost of them is one aspect. Then the many layers which a request has to travel or be split into smaller requests makes it difficult to trace it and debug it. Also there are aspects which regard all communications therefore they might benefit of having them centralized and contained. Proxy utilities, for both levels, 4 and 7, are another concern which might have a stake into how a service mesh works. Latencies, HTTP success rates, requests per second, read/write bytes per second, and many others are metrics which need to be looked after. All those aspects and many others, for example see \cite{b15}, come together into an interplay which is generally called a service mesh. One off the shelf product of this type will be used in the implementation, section \ref{sec:implementation}.
+
+\subsection{The concept of traffic splitting}
+
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.25]{traffic100old.png}
+        \caption{Traffic goes to a single version of the service}
+        \label{fig:traffic100old}
+    \end{figure}
+
+    The departure situation can be seen in figure \ref{fig:traffic100old}. All clients are talking to the same version of the service. It is out of current scope to define the way this traffic goes into a Kubernetes cluster or its ingress, in the its parlance or what kind of traffic is but the assumption is that we have to deal with TCP or UDP traffic, on top of which, usually, there might HTTP calls or RPC ones. The basic assumption, though, is that the proxy which is used is a layer 4 one per Open Systems Interconnection model \cite{b14}.
+
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.25]{traffic9010.png}
+        \caption{Traffic goes to both versions of the service}
+        \label{fig:traffic9010}
+    \end{figure}
+
+    After the deployment of the new version of the service, the service mesh will start to route a part of the traffic to the new service. Figure \ref{fig:traffic9010} depicts this situation. The factors of routing are a set of initial parameters and they can be manually and progressively modified or an automated tool can be used.
+
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.25]{traffic100new.png}
+        \caption{Traffic goes to the new version of the service}
+        \label{fig:traffic100new}
+    \end{figure}
+
+    If the traffic to the new service has the same error rate as the old one and same P99 latency then the finally situation is to have the entire traffic routed only to the new service. This can be seen in \ref{fig:traffic100new}. Once the old service doesn't receive any traffic it can be removed together with all its dependencies.
 
 \section{Implementation}
+\label{sec:implementation}
+
+    For the implementation following products have been used: Kubernetes \cite{b9} for orchestrating microservices and Linkerd \cite{b16} as the service mesh. A dummy web server has been setup and an artificial loading pod has been put in place to call the web service and simulate load on it.
+
+    Let's look at the figure \ref{fig:canary}. The service used for rolling its versions is named \textit{podinfo}. The right rectangle, called \textit{svc/podinfo} is the service which internal clients see and can use. External clients may see same service but in order to do this an ingress object has to be set and it has to be instructed to route a certain path towards this service. This ingress become an abstraction which can hide the service name for external clients. Back to the figure \ref{fig:canary}, the right rectangles, called \textit{svc/podinfo-canary} and \textit{svc/podinfo-primary} are the actual two services which correspond to the two versions implied, the old one, named \textit{primary} and new one which the service is rolling to, called \textit{canary}. The same rectangles offers few more informations, in real time:
+
+    \begin{itemize}
+        \item Weight is the percent of traffic which is routed to the respective under-service, primary or canary.
+        \item SR stands for Success Rate and shows how many requests have succesfully finished.
+        \item RPS stands for Requests Per Second
+        \item P99 shows the latency for the 99th percentile
+    \end{itemize}
+
+    The left rectangle, \textit{svc/podinfo}, shows the SR and RPS numbers in total. As expected, the RPS number for both \textit{primary} and \textit{canary} should sum up to the total.
+
+    Finally, the bottom part of the figure \ref{fig:canary} shows similar information with the difference that it also contains latencies for 50 and 95 percentiles.
+
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.25]{canary.png}
+        \caption{Traffic split between two versions}
+        \label{fig:canary}
+    \end{figure}
+
+    Success rate and latencies are playing a major role into minimizing the errors seen by clients. The rolling process can choose to stop the rolling if the success rate of the canary version drops below 99\% or below the primary version.
+
+\section{Conclusions}
+
+    A generally explanation and few introductory terms have been presented. Also a bit of history of software has been noted through older published papers so that a comparison can be made between what was happening twenty years ago and today. Those have been covered on the \textit{Introduction} and on the \textit{Current state}.
+    
+    Theoretical and explanatory subjects have been discussed about the world of microservices and orchestration: isolation, containers, orchestration, linux namespaces, communications, proxies and service meshes. Commercial examples have been given so that the concepts discussed can be further studied in the context of how they were implemented.
+
+    The \textit{Solution} section dwells more into how the concepts are choosed to be implemented and what technologies were used, while at the same time offering a complete picture of what traffic splitting is trying to achieve, i.e to minimize the errors seen by the client when new versions of software are deployed and released.
+
+    Finally, the \textit{Implementation} section shows each technology which was choosen and actual screen shots taken during a new software version rolling or releasing, using a service within a Kubernetes cluster.
+
 
 \begin{thebibliography}{00}
 
@@ -106,6 +170,17 @@
     \bibitem{b10} Burns, Brendan, et al. "Borg, omega, and kubernetes." Queue 14.1 (2016): 70-93.
 
     \bibitem{b11} CNCF. \href{https://www.cncf.io}{CNCF website}
+
+    \bibitem{b12} Linux network namespaces. \href{https://www.systutorials.com/docs/linux/man/7-network_namespaces/}{Linux Man Pages}
+
+    \bibitem{b13} Linux IP Tables. \href{https://www.systutorials.com/docs/linux/man/8-iptables/}{Linux Man Pages}
+
+    \bibitem{b14} OSI Model. \href{https://en.wikipedia.org/wiki/OSI_model}{Wikipedia page for OSI Model}
+
+    \bibitem{b15} Li, Wubin, et al. "Service Mesh: Challenges, state of the art, and future research opportunities." 2019 IEEE International Conference on Service-Oriented System Engineering (SOSE). IEEE, 2019.
+
+    \bibitem{b16} Linkerd. \href{https://linkerd.io}{Linkerd website}
+
 \end{thebibliography}
 \vspace{12pt}
 
