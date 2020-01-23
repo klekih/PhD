@@ -4,6 +4,8 @@
 \BOOKMARK [1][-]{section.3}{Solution}{}% 4
 \BOOKMARK [2][-]{subsection.3.1}{Microservices and orchestration}{section.3}% 5
 \BOOKMARK [2][-]{subsection.3.2}{Kubernetes}{section.3}% 6
-\BOOKMARK [2][-]{subsection.3.3}{Service meshes}{section.3}% 7
-\BOOKMARK [1][-]{section.4}{Implementation}{}% 8
-\BOOKMARK [1][-]{section*.1}{References}{}% 9
+\BOOKMARK [2][-]{subsection.3.3}{Service mesh}{section.3}% 7
+\BOOKMARK [2][-]{subsection.3.4}{The concept of traffic splitting}{section.3}% 8
+\BOOKMARK [1][-]{section.4}{Implementation}{}% 9
+\BOOKMARK [1][-]{section.5}{Conclusions}{}% 10
+\BOOKMARK [1][-]{section*.1}{References}{}% 11

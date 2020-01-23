@@ -8,6 +8,7 @@
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{hyperref}
+\usepackage{balance}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
@@ -30,15 +31,15 @@
 \maketitle
 
 \begin{abstract}
-    When deployments of new versions of a software are needed, their introduction into production might create service disruptions for end users. This papers explores the concept of traffic splitting where a new version is released and then gradually deployed to the users. The graduality means that both versions are up at the same time and the new one will initially receive only 10\% of traffic. If the traffic is deemed to have same error rate as the old version then the splitting rules are increased. Finally, the old version will receive no traffic and can be removed from the system.
+    When deployments of new versions of a piece of software are needed, their introduction into production might create disruptions for end users. This papers explores the concept of traffic splitting where a new version is released and then gradually deployed to the users. The graduality means that both versions are up at the same time and the new one will initially receive only a small percentage (10\%) of traffic. If the traffic is deemed to have same error rate as the old version then the splitting rules are increased. Finally, the old version will receive no traffic and can be removed from the system.
 \end{abstract}
 
 \begin{IEEEkeywords}
-    software trials, microservices, traffic splitting, Kubernetes, Linkerd
+    software trials, software deployments, microservices, traffic splitting, Kubernetes, Linkerd
 \end{IEEEkeywords}
 
 \section{Introduction}
-    In today's online software solutions the primary service level agreement (SLA) is the uptime. Site reliability engineers (SREs) are striving to achieve perfection and they measure their target in number of nines, i.e. 99.999\%. Altough for ordinary users the small difference is not noticeable due to their various internet connection problems, the achievement is nevertheless an impresive feat. To achieve this, various tehniques and software solutions are put together in clever ways. This paper will explore the use of microservices for serving traffic and the deployment of new versions of the same software in a manner where users are seeing minimum disruption of the service they are using.
+    In today's online software solutions the primary service level agreement (SLA) is the uptime. Site reliability engineers (SREs) are striving to achieve perfection and they measure their target in number of nines, i.e. 99.999\%. Altough for ordinary users the small difference is not noticeable due to their various internet connection problems, the achievement is nevertheless an impresive feat. To achieve this, various techniques and software solutions are put together in clever ways. This paper will explore the use of microservices for serving traffic and the deployment of new versions of the same software in a manner where users are seeing minimum disruption of the service they are using.
 
 \subsection{Terms}
     To lay the foundation of the upcoming discussion few definitions are needed.
@@ -47,38 +48,42 @@
 \paragraph{Deploy}
     Once the new version is starting to serve traffic to external end users, it is said that the version has been deployed.
 \paragraph{Error rate}
-    A service which responds with error codes, on top of any other data it might need to send back, will likely respond from time to time with codes other than successfull ones (e.g. in HTTP error codes the number 200 means the response is succesfull while the well known number 404 means that a certain resource has not been found), from reasons which are outside its inner workings. For example the users accidentally asks for a resource which was previously deleted, case where the service itself cannot do anything but respond with an error code.
+    A service which responds with error codes, on top of any other data it might need to send back, will likely respond from time to time with codes other than successfull ones (e.g. in HTTP error codes the number 200 means the response is succesfull while the well known number 404 means that a certain resource has not been found), from reasons which are outside its inner workings. For example the users accidentally asks for a resource which was previously deleted, this being a case in which the service itself cannot do anything but respond with an error code.
 
 \section{Current state}
     Software deployment has become an area of innovation since CD-ROMs weren't anymore the only solution. One of the old (dated back in 1999) and good readings about this subject propose the Software Dock \cite{b1}. This idea splits the process in two areas: producer side and consumer side. Producer side processes are responsible for bridging the development and deployment realms.
 
-    An interesting read is the analysis made by A. Dearle in \cite{b3}. He analyzes few technology names which were widely used to deploy software, despite the fact that, during the period after \cite{b3} has been published few of those technologies are not anymore the defacto deployment solutions. Java Beans, created by Sun (later it was acquired by Oracle) has 4 phases: development, deployment, service availability and undeployment. Linux is another example using Red Hat Package Manager. Altough RPM is widely in use for deploying software or packages, it is not used to deploy it in live or online environments but rather on linux distros, while in "offline" mode.
+    An interesting read is the analysis made by A. Dearle in \cite{b3}. He analyzes few technology names which were widely used to deploy software, despite the fact that, in the period after \cite{b3} has been published, few of those technologies are not anymore the defacto deployment solutions. Java Beans, created by Sun (later it was acquired by Oracle) has 4 phases: development, deployment, service availability and undeployment. Linux is another example using Red Hat Package Manager. Altough RPM is widely in use for deploying software or packages, it is not used to deploy it in live or online environments but rather on linux distros, while in "offline" mode.
 
-    Finally, because this paper mentions error rates, it is worth noting the work of Zhang and Pham, in \cite{b2}, who propose a software reliability growth model and adressing the difference seen between test environment and field environment. The model they propose encompasses the fact that errors and faults are not always solvable in an instant manner but they need to be deferred, usually because of the development process or because of using off-the-shelf software solutions.
+    Finally, because this paper mentions error rates, it is worth noting the work of Zhang and Pham, in \cite{b2}, who propose a software reliability growth model and adress the difference seen between test environment and field environment. The model they propose encompasses the fact that errors and faults are not always solvable in an instant manner but they need to be deferred, usually because of the development process or because of using off-the-shelf software solutions.
     
 \section{Solution}
 
 \subsection{Microservices and orchestration}
-    Microservices are the state of the art for designing new data and traffic intensive applications, while at the same time taking advantage of few mandatory issues revolving around today's challenges \cite{b5}: security is paramount and isolation and appropiate permissions for them (e.g. no 'sudo' user running code in a container) are an attractive concept. They enable architecture granularity which solves few challenges around Conway's law ("organizations which design systems ... are constrained to produce designs which are copies of the communication structures of these organizations" \cite{b4}). They advertise and mostly provide identical environments for both development and production. They package code and together with a wise package manager (e.g. Node Package Manager or NuGet) they solve the dependency hell and, sometimes, the tight coupling with the host OS (which still exists but is contained in the container as its definition, not anymore a host OS prerequisite). They also provides easier orchestration and elasticity in demand and configuration. However, as much as they are advertised as the ultimate architectural solution, there are cases when different architecture paradigms are better. One example would be monoliths \cite{b6} (altough they are greatly blamed by the proponents of microservices) and another one could be actor model \cite{b7}.
-
-    One can quickly start and use any microservice type approach towards a software solution. Any proof of concept is feasible and doable within minutes with all the open source generally available images for various products (databases, APIs, etc.). However upon doing a commercially viable product or a solution whose complexity is bigger, the first and uttermost problem is the handling of containers. This includes their lifetime, communications between them or with outer entities, persistence, updates, failure resilience, etc. The term "orchestration" sums up all those various operations.
+    Microservices are the state of the art for designing new data and traffic intensive applications, while at the same time taking advantage of few mandatory issues revolving around today's challenges \cite{b5}: security is paramount and isolation and appropiate permissions for them (e.g. no 'sudo' user running code in a container) are an attractive concept. They enable architecture granularity which solves few challenges around Conway's law:
     
-    The defacto solution for building and starting containers is Docker \cite{b8}. It also offers a simple orchestrator called Docker Compose, meant to run on a single computer. Its enterprise offerings contain Docker Swarm, a much more capable orchestrator. The current paper, however, will rely on the most ubiquitous solution of today's distributed systems world: Kubernetes \cite{b9}. More details on this, in subsection \ref{subsec:kube}.
+    \begin{quote}      
+        Organizations which design systems ... are constrained to produce designs which are copies of the communication structures of these organizations. \cite{b4}
+    \end{quote} They advertise and mostly provide identical environments for both development and production. They package code and together with a wise package manager (e.g. Node Package Manager or NuGet) they solve the dependency hell and, sometimes, the tight coupling with the host OS (which still exists but is contained in the container as its definition, not anymore a host OS prerequisite). They also provides easier orchestration and elasticity in demand and configuration. However, as much as they are advertised as the ultimate architectural solution, there are cases when different architecture paradigms are better. One example would be monoliths \cite{b6} (altough they are greatly blamed by the proponents of microservices) and another one could be actor model \cite{b7}.
+
+    One can quickly start and use any microservice type approach towards a software solution. Any proof of concept is feasible and doable within minutes with all the open source generally, available images for various products (databases, APIs, etc.). However upon doing a commercially viable product or a solution whose complexity is bigger, the first and uttermost problem is the handling of containers. This includes their lifetime, communications between them or with outer entities, persistence, updates, failure resilience, etc. The term "orchestration" sums up all those various challenges.
+    
+    The defacto solution for building and starting containers is Docker \cite{b8}. It also offers a simple orchestrator called Docker Compose, meant to run on a single computer. Its enterprise offerings contains Docker Swarm, a much more capable orchestrator. The current paper, however, will rely on the most ubiquitous solution of today's distributed systems world: Kubernetes \cite{b9}. More details on this, in subsection \ref{subsec:kube}.
 
 \subsection{Kubernetes}
 \label{subsec:kube}
 
     Kubernetes stems from Google and has grown on the experience and challenges Google faced while building and maintaining their services, after two other closed sourced were build and used: Borg and Omega \cite{b9}. Kubernetes is open source and is not anymore managed by Google but by a foundation they have spinned up to oversee Kubernetes (and now they have hundreds of open source solutions in their landscape), called Cloud Native Computing Foundation or CNCF \cite{b11}.
 
-    Its offerings are overwhelming, both in their number and in their complexity. On top of them the third party offerings are intimidating at least. For the current paper only a handful of them will be described.
+    Its offerings are overwhelming, both in their number and in their complexity. On top of them the third party offerings are intimidating at least. For the current paper, however, only a small number of them will be briefly touched and explained.
 
-    Taken in a good order for understanding, the first item to discuss is to asses the microservices concept into Kubernetes context. Being made for orchestrating microservices is itself a collection of various microservices. (The details of its fabric are out of our scope). Therefore whatever it is to run by Kubernetes it has to be an image which became one or more pods (or containers). On top of this we need to know there is a service which knows about all pods of a certain type and expose their ports to outer (within same Kubernetes cluster or outside of it) clients. This service is also an abstraction on top of replicated pods, where it can load balance the traffic or route only to the pods which are healthy. Besides services (and their underpart called deployments) there are many other concepts which are having a play: ingresses, config maps, secrets, replicas, etc.
+    Taken in a good order for understanding, the first item to discuss is to asses the microservices concept into Kubernetes context. Being made for orchestrating microservices is itself a collection of various microservices. (The details of its fabric are out of our scope). Therefore whatever it is to run by Kubernetes it has to be an image which became one or more pods (or containers). On top of pods, not necessarily the next level, there is a service which knows about all of them who belong to a certain type and expose their ports to outer clients (within same Kubernetes cluster or outside of it). This service is also an abstraction on top of replicated pods, where it can load balance the traffic or route only to the pods which are healthy. Besides services (and their underpart called deployments) there are many other concepts which are having a play: ingresses, config maps, secrets, replicas, etc.
 
-    The final part for this puzzle we need is the pod mechanics. A pod is the base unit in Kubernetes and it might contain one or more containers. In practice there is a main container which is serving some business logic functionality and all the others, "supporting" containers, are called sidecars. For the current's subject the single piece of interplay between a container and a sidecar, within a pod, is to know the existence of Linux namespaces, specifically of network namespaces \cite{b12}. This functionality allows for a sidecar to hijack the communications of a container, using iptables \cite{b13}, in a transparent manner for the container, i.e. the container do not know that its communications are proxied via a sidecar. In practice this allows for a developer or a devops person to use a self made container with the business functionality it needs, while at the same time to use a third party product for inserting proxy or proxy-based functionalities.
+    The final part for this puzzle is about some of the pod mechanics. A pod is the base unit in Kubernetes and it might contain one or more containers. In practice there is a main container which is serving some business logic functionality and all the others, "supporting" containers, are called sidecars. For the current's subject the single piece of interplay between a container and a sidecar, within a pod, is to know the existence of Linux namespaces, specifically of network namespaces \cite{b12}. This functionality allows for a sidecar to \textit{hijack} the communications of a container, using iptables \cite{b13}, in a transparent manner for the container, i.e. the container do not know that its communications are proxied via a sidecar. In practice this allows for a developer or a devops person to use a self made container with the business functionality it needs, while at the same time to use a third party product for inserting proxy or proxy-based functionalities.
 
 \subsection{Service mesh}
 
-    The high reliance on communications between many microservices has quickly became a friction regarding several aspects. The operational cost of them is one aspect. Then the many layers which a request has to travel or be split into smaller requests makes it difficult to trace it and debug it. Also there are aspects which regard all communications therefore they might benefit of having them centralized and contained. Proxy utilities, for both levels, 4 and 7, are another concern which might have a stake into how a service mesh works. Latencies, HTTP success rates, requests per second, read/write bytes per second, and many others are metrics which need to be looked after. All those aspects and many others, for example see \cite{b15}, come together into an interplay which is generally called a service mesh. One off the shelf product of this type will be used in the implementation, section \ref{sec:implementation}.
+    The high reliance on communications between many microservices has quickly became a friction regarding several aspects. The operational cost of them is one aspect. Then the many layers which a request has to travel or be split into smaller requests makes it difficult to trace it and debug it. Also there are metrics and information which regard all communications therefore they might benefit of having them centralized and contained. Proxy utilities, for both levels, 4 and 7, are another concern which might have a stake into how a service mesh works. Latencies, HTTP success rates, requests per second, read/write bytes per second, and many others are metrics which need to be looked after. All those aspects and many others, for example see \cite{b15}, come together into an interplay which is generally called a service mesh. One off the shelf product of this type will be used in the implementation, section \ref{sec:implementation}.
 
 \subsection{The concept of traffic splitting}
 
@@ -89,7 +94,7 @@
         \label{fig:traffic100old}
     \end{figure}
 
-    The departure situation can be seen in figure \ref{fig:traffic100old}. All clients are talking to the same version of the service. It is out of current scope to define the way this traffic goes into a Kubernetes cluster or its ingress, in the its parlance or what kind of traffic is but the assumption is that we have to deal with TCP or UDP traffic, on top of which, usually, there might HTTP calls or RPC ones. The basic assumption, though, is that the proxy which is used is a layer 4 one per Open Systems Interconnection model \cite{b14}.
+    The departure situation can be seen in figure \ref{fig:traffic100old}. All clients are talking to the same version of the service. It is out of current scope to define the way this traffic goes into a Kubernetes cluster via its ingress, or what kind of traffic is but the assumption is that we have to deal with TCP or UDP traffic, on top of which, usually, there might HTTP calls or RPC ones. The basic assumption, though, is that the proxy which is used is a layer 4 one per Open Systems Interconnection model \cite{b14}.
 
     \begin{figure}
         \centering
@@ -107,7 +112,7 @@
         \label{fig:traffic100new}
     \end{figure}
 
-    If the traffic to the new service has the same error rate as the old one and same P99 latency then the finally situation is to have the entire traffic routed only to the new service. This can be seen in \ref{fig:traffic100new}. Once the old service doesn't receive any traffic it can be removed together with all its dependencies.
+    If the traffic to the new service has the same error rate as the old one and same P99 latency then the finally situation is to have the entire traffic routed only to the new service. This can be seen in figure \ref{fig:traffic100new}. Once the old service doesn't receive any traffic it will be removed together with all its dependencies.
 
 \section{Implementation}
 \label{sec:implementation}
@@ -138,14 +143,15 @@
 
 \section{Conclusions}
 
-    A generally explanation and few introductory terms have been presented. Also a bit of history of software has been noted through older published papers so that a comparison can be made between what was happening twenty years ago and today. Those have been covered on the \textit{Introduction} and on the \textit{Current state}.
+    A generally explanation and few introductory terms have been presented for laying the grounds of the subject. Also a bit of history of software deployments has been noted through older published papers so that a comparison can be made between what was happening twenty years ago and today. Those have been covered on the sections \textit{Introduction} and \textit{Current state}.
     
     Theoretical and explanatory subjects have been discussed about the world of microservices and orchestration: isolation, containers, orchestration, linux namespaces, communications, proxies and service meshes. Commercial examples have been given so that the concepts discussed can be further studied in the context of how they were implemented.
 
     The \textit{Solution} section dwells more into how the concepts are choosed to be implemented and what technologies were used, while at the same time offering a complete picture of what traffic splitting is trying to achieve, i.e to minimize the errors seen by the client when new versions of software are deployed and released.
 
-    Finally, the \textit{Implementation} section shows each technology which was choosen and actual screen shots taken during a new software version rolling or releasing, using a service within a Kubernetes cluster.
+    Finally, the \textit{Implementation} section shows each technology which was choosen and actual screen shots taken during a new software version rolling or releasing, using an example service within a Kubernetes cluster.
 
+\balance
 
 \begin{thebibliography}{00}
 
@@ -182,6 +188,5 @@
     \bibitem{b16} Linkerd. \href{https://linkerd.io}{Linkerd website}
 
 \end{thebibliography}
-\vspace{12pt}
 
 \end{document}
