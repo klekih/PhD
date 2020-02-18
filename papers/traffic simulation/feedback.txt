@@ -1,0 +1,25 @@
+(1) The third paragraph in page one is not necessary
+(2) Author(s) should adhere strictly to the Journal's format for citation and referencing
+(3) Author(s) should be very consistent in the usage of Fig and Figure
+Keywords are missing.
+The introduction is significantly too short and the authors does not properly describe the problems that they are solving. The paper lacks crucial parts: related work, evaluation. Conclusion is missing. Future work is missing. 
+
+#############################
+
+This paper proposes a traffic simulation solution based on micro services simulations. The design is centered
+around two types of actors: the city simulation actor and the car which travels across the city. Orchestration is
+the key element for handling containers and microservices to bring coherence into their interaction and an
+unifying experience to the end user (section IV). The paper presents the results and also enumerates a number of
+enhancements which can be further developed around the concept of simulating a city traffic through actors
+running in microservices (section VI). Observations:
+• I recommend a clearer presentation of the results obtained and of the advantages offered compared to
+other solutions.
+• There is no correlation between the names of the figures (Fig. ...) and their reference (Figure ...)
+
+###############################
+
+- Poor in writing abstract and flow of the paper
+- References is not up to date (recent 5 years)
+- The paper does not have significant info up to journal level. Only minor technical quality / experiment conducted 
+- References need not be cited in the text (as “author name, year”). When they are, they appear on the line, in square brackets, inside the punctuation.
+- Review the position of the figure 2 and 3.

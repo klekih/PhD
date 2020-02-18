@@ -1,19 +1,20 @@
 \documentclass[conference]{IEEEtran}
 % The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
-\usepackage{url,apacite}
+\usepackage{url}
 \usepackage{amsmath,amssymb,amsfonts}
-\usepackage{algorithmic}
+%\usepackage{algorithmic}
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
-\usepackage{natbib}
+%\usepackage{natbib}
 \graphicspath{ {.} }
-\bibliographystyle{apacite}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
 T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \usepackage{listings}
 \usepackage{xcolor}
+
+\usepackage{balance}
  
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -62,30 +63,30 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \begin{abstract}
 
-Simulating traffic in a city is a difficult task. Current paper is proposing a novel way using the state of the art in today's distributed systems: microservices orchestration. The design is centered around two types of actors: a city simulation actor (a single instance of it) which keeps track of occupied streets and and their gradual occupation. The other actor type (multiple instances) is the car which travels across the city.
+The paper proposes a city traffic software simulation based on actors which run independently of one another and have specific characters in their behavior. To run indepentently actors are modeled as microservices and they are running within an orchestration framework. Their specific behavior is modeled as simple algorithms, embedded in each actor's type code. They may act based on the data about all the other actors, data which is gathered together by a single entity called city simulator. An orchestration model is proposed and all the actors have a communication protocol to offer data to the city simulator and request data from it. 
 
 \end{abstract}
+
+\begin{IEEEkeywords}
+  traffic simulation; microservices; distributed computing
+\end{IEEEkeywords}
 
 \section{Introduction}
 
 A solution which simulates car, pedestrian, etc. traffic in a given city may reap many benefits. It can help understand patterns of traffic and its flow. It can help understand the particularities and pecularities of a city's streets arrangements, together with their junctions. It can help identify bottlenecks. It can help find solutions to rush problems and explore them. But for those areas to be tackled, appropiate methods of simulating traffic must be found and explored. We are proposing a novel way of simulating traffic based on the microservices orchestration concept and using a discrete microscopic logic for the behavior of each actor.
 
-We define a \textbf{(city) actor} as being an independent entity which chose to move between two geographical points within a city. It can be a car, a pedestrian or a bike. We also define the \textbf{city simulator} as being a single entity (subject to distributed and load balacing services) which keeps data about the city (e.g. streets with city actors on them).
+The solution proposed is aiming to design a traffic simulation software which surpasses the computing limits of a single machine and of existing traffic simulation software and runs as a distributed system. In close interplay with the fundamental nature of distributed system (i.e. running a cohesive software on multiple machines) the solution defines entities or actors, modeled as separate microservices, such that the advantage is twofold. First, an entity being a single microservice (and a microservice containing only one entity) they will be easier and natural scheduled and run across more than one machine. Second, the independence of such an entity is also helping in personalize its behavior in randomness and character, offering different ways to model the traffic in a city and allowing more nuanced studies as opposed to macroscopic solutions.
 
-This paper is structured in few sections. Section \ref{sec:existingsolutions} contains a summary of few other papers and ideas around the same subject of traffic simulation. Section \ref{sec:implementation} discuss the core approach of the current paper in architecting a software solution based on microservices for simulating traffic in a city. Section \ref{sec:orchestration} discuss the architectural aspect of orchestrating microservices using popular frameworks and solutions. Section \ref{sec:results} presents the results obtained after the implementation of some of the core concepts from the previous sections.
+We define a \textbf{(city) actor} as being an independent entity which chose to move between two geographical points within a city. As a character, it can be a car, a pedestrian or a bike. We also define the \textbf{city simulator} as being a single entity (subject to distributed and load balacing services) which keeps data about the city (e.g. streets with city actors on them).
 
-\section{Existing solutions}
+\section{Related work}
 \label{sec:existingsolutions}
 
-Existing solutions have a general distinction of being on a spectrum: macroscopic, mesoscopic or microscopic. This distinction is caused by how the traffic is modeled: on a macroscopic scale like streets or sections of a highway or on microscopic level, focusing on each car and its relation with neighbours. The relation between a car and its neighbours, can also be modeled as microscopic or nanoscopic.
+Existing solutions have a general distinction of being scattered across a spectrum: macroscopic, mesoscopic or microscopic being milestones across it. This distinction is caused by how the traffic is modeled: on a macroscopic scale like streets or sections of a highway or on microscopic level, focusing on each car and its relation with neighbours. The relation between a car and its neighbours, can also be modeled as microscopic or nanoscopic.
 
-\cite{6973934} is describing a multiagent system for interactions between pedestrians and vehicles, where each pedestrian and vehicle is an intelligent agent with its own personality and decisions. This idea is an interesting one especially because it is proposed as an enhancement to the solution presented by the current paper. In the same area of microscopic simulation we can see another proposal from \cite{7004985}. Of a great interest is their ability to feed back in the simulation the data gathered from loop detectors across the portion of highway they are particularly interested in.
-
-\cite{6205472} is probably the most viable approach as it is a complete simulation software. Based on the Ngel-Schreckenberg \citep{nagel-schreckenberg} automaton model of simulating a freeway traffic, P. Gora is advancing this idea into a fully fledged software simulation framework.
+(to rewrite) In the same area of microscopic simulation we can see another proposal from \cite{7004985}. Of a great interest is their ability to feed back in the simulation the data gathered from loop detectors across the portion of highway they are particularly interested in.
 
 In \cite{8569576} the broad idea is to use a discrete event architecture, in which there are logical processes for executing and simulating a number of agents. For a computation intensive aim those processes can be clustered into agent clusters with dependencies between them. The particularity of this proposal is that it crosses the boundaries of a single computing machine and pave a way to distribute the load and information across machines, with certain limitations and challenges.
-
-Finally, \cite{6244609} propose optimization computation for intersections (junctions) by using a microscopic approach towards data analysis. The proposal use a discrete and stochastic time step of simulation model, combined with Synchro, a signal timing optimization software.
 
 \section{Implementation}
 \label{sec:implementation}
@@ -94,11 +95,11 @@ The entities which are participating into a traffic simulation are called actors
 
 \subsection{Microservices}
 
-Microservices are not a new concept. The idea behind them has existed since Linux kernel has started to be enriched with a concept called namespaces \citep{wiki:linuxns}. This allows one set of processes to see one set of resources while another set of processes see another set of resources, where resources might be, but not limited to, process IDs, file names and network resources. Those linux kernel abilities form the base of containers.
+Microservices are not a new concept. The idea behind them has existed since Linux kernel has started to be enriched with a concept called namespaces \cite{wiki:linuxns}. This allows one set of processes to see one set of resources while another set of processes see another set of resources, where resources might be, but not limited to, process IDs, file names and network resources. Those linux kernel abilities form the base of containers.
 
 Thus, a container is a small set of processes which run in isolation. They allow packaging a linux distro, a set of libraries and a software development kit and on top of those the custom code of an application. Taken together, those form an image, which is essentially a tar gzipped file. Once the build process of an image is finished, it can be spinned up in one or more running containers. The custom code written and embedded in the image is running in parallel in each container.
 
-To go to solution for building, manipulating and running images is Docker \citep{docker}. It allows easy software installation, it works cross platform and it offers a smooth experience most of the time.
+To go to solution for building, manipulating and running images is Docker \cite{docker}. It allows easy software installation, it works cross platform and it offers a smooth experience most of the time.
 
 \subsection{City simulator}
 \label{subsection:citysimulator}
@@ -107,7 +108,7 @@ The most common and easy solution to share data across all the city actors is to
 
 The density is defined as the number of actors (cars) which are at a given moment present on a given segment of street. If the city simulator has no entry of a street segment then it will consider the density as being 0, i.e. there is no actor on that street. The density is modeled as an unsigned integer.
 
-Figure \ref{fig:citysimrelations} depicts the city simulator in relation with the other entities. A notable exception is the web page. Its purpose is not to participate in the same information exchange the other entities have but to offer a visual interpretation about the way the city and the other actors are interacting with one another.
+Fig. \ref{fig:citysimrelations} depicts the city simulator in relation with the other entities. A notable exception is the web page. Its purpose is not to participate in the same information exchange the other entities have but to offer a visual interpretation about the way the city and the other actors are interacting with one another.
 
 \begin{figure}
     \includegraphics[width=8cm]{CitySimulator.png}
@@ -133,7 +134,7 @@ As part of this proposal the city simulator is made to be a standalone entity (c
 
 The city actor represents a moving actor within a city. It can be a car which moves across the city, it can be a bike or it can be a pedestrian. Its naming suggests that it can be any entity or living being which moves within a city and interacts with the other entities or affects the other entities in some manner. A pedestrian would directly interact with other pedestrians but not with cars unless it crosses the street on red or on unmarked places. A pedestrian would indirectly affect other cars by willing to walk over a street crossing.
 
-The implementation proposed here is aiming to model a single type of actor: a car which moves between two points across a city. Because the purpose of this paper is not to tackle maps representation and routing through a city (in itself, this area is way bigger than a mere technical paper) the city actor is using two notable services: Open Street Map \citep{openstreetmap} and GraphHopper \citep{graphhopper}. Open Street Map is an open source licensed map of the entire world. Graphhoper is an open source service which offers directions APIs and route planning. It can use Open Street Map as an underlying map provider. They provide free tiers and paid subscription for accessing an API and compute various routes. However, a city actor is not using any public api but a special crafted container which contains GraphHopper and an open street map embedded into it. Thus, this container is running in parallel with the other city actors and provides them with the routing API they need.
+The implementation proposed here is aiming to model a single type of actor: a car which moves between two points across a city. Because the purpose of this paper is not to tackle maps representation and routing through a city (in itself, this area is way bigger than a mere technical paper) the city actor is using two notable services: Open Street Map \cite{openstreetmap} and GraphHopper \cite{graphhopper}. Open Street Map is an open source licensed map of the entire world. Graphhoper is an open source service which offers directions APIs and route planning. It can use Open Street Map as an underlying map provider. They provide free tiers and paid subscription for accessing an API and compute various routes. However, a city actor is not using any public api but a special crafted container which contains GraphHopper and an open street map embedded into it. Thus, this container is running in parallel with the other city actors and provides them with the routing API they need.
 
 A first way to introduce randomness into the entire simulation of a city is to choose a set of two coordinates inside the given city, a set for each city actor. Then the actor proceeds to ask GraphHopper service for a route between those two points. Because each city actor 'lives' only while its moving across its route and 'dies' as soon as it reached the finish point, the entire city simulation which takes place is made of independent, random and always new actors.
 
@@ -187,7 +188,7 @@ type Envelope struct {
 
 As with every software project started from scratch there are a number of choices to make when choosing software stacks, programming languages, networking models, etc. This section is aiming to explore the rationales behind some of those decisions and how they influenced the building of the current prototype.
 
-A first choice is the programming language to write both the city simulator and the city actor. Go programming langauge is born out of Google and it resembles the philosophy they were trying to embedded in it for taming the complexity of their systems \citep{donovan2015go}. Today it has gained a lot of popularity and tools like Kubernetes are wrritten entirely in Go, making it the default language of the cloud technologies. It is a "C-like" language and it has a familiar look but with few traits which makes it different. Out of those, few are notable, not only because they facilitate programming endeavors but also because both city simulator and city actor are modeled around them in their communications. 
+A first choice is the programming language to write both the city simulator and the city actor. Go programming langauge is born out of Google and it resembles the philosophy they were trying to embedded in it for taming the complexity of their systems \cite{donovan2015go}. Today it has gained a lot of popularity and tools like Kubernetes are wrritten entirely in Go, making it the default language of the cloud technologies. It is a "C-like" language and it has a familiar look but with few traits which makes it different. Out of those, few are notable, not only because they facilitate programming endeavors but also because both city simulator and city actor are modeled around them in their communications. 
 
 \begin{lstlisting}[caption=Go routine from city actor, label=lst:goroutine]
 go func() {
@@ -204,20 +205,6 @@ go func() {
 
 Go routines are a lightweight thread of executing. Being lightweight it means they can be easily started, with no overhead and especially without the ceremony of dealing with threads which other popular languages (e.g. Java) have. Listing \ref{lst:goroutine} shows such a routine. It is a part of logic where the city actor responds to either two events: the timer has expired and a decision needs to be made or an information about the line is currently traveling on has been received from the city simulator. Another Go trait is the channels, an indexed communication pipe where there are asynchronous writers and readers, used to decouple two routines. Listing \ref{lst:goroutine} also shows couple of channels. Variables \textit{ticker} and \textit{lineChan} are two channels. They are declared using a type and after that they are used to write and read objects (or structs) of the respective type. The \textit{select} keyword acts like a switch, not on variables and their values but on channels. It will execute the block of code for the channel which has something new to deliver. All those three concepts, \textit{goroutines}, \textit{channels} and \textit{select} switches, combined together makes it easy to write code which takes advantage of multithreading paradigms and which has to run in a heavy networking environment.
 
-\begin{figure*}
-  \includegraphics[width=0.9\linewidth]{ScreenshotWebInterface.jpg}
-  \centering
-  \caption{Screenshot of the web interface showing the running simulation}
-  \label{fig:ScreenshotWebInterface}
-\end{figure*}
-
-\begin{figure*}
-  \includegraphics[width=0.9\linewidth]{ScreenshotWebInterface2.jpg}
-  \centering
-  \caption{Screenshot of the web interface showing the running simulation with a larger number of actors}
-  \label{fig:ScreenshotWebInterface2}
-\end{figure*}
-
 \section{Orchestration}
 \label{sec:orchestration}
 
@@ -227,7 +214,7 @@ The term orchestration means the handling of containers and microservices in ord
 
 \subsection{Current state}
 
-As noted above the standard in easiness of developing and working with containers is Docker \citep{docker}. While it has an offering of orchestrating containers, called \textit{docker-compose}, which is simple to start with, its functionality is limited in comparison with other offerings, the most notable one being Kubernetes \citep{Kubernetes}. Those are not the single tools available and many more can be found but they offer a starting point (especially Docker) and Kubernetes, altough it has a steep learning curve, it does offer a comprehensive and complex panoply of details around orchestration.
+As noted above the standard in easiness of developing and working with containers is Docker \cite{docker}. While it has an offering of orchestrating containers, called \textit{docker-compose}, which is simple to start with, its functionality is limited in comparison with other offerings, the most notable one being Kubernetes \cite{Kubernetes}. Those are not the single tools available and many more can be found but they offer a starting point (especially Docker) and Kubernetes, altough it has a steep learning curve, it does offer a comprehensive and complex panoply of details around orchestration.
 
 \subsection{Implementation}
 
@@ -269,9 +256,9 @@ The other detail of running this set of containers is to scale up a specific ser
 \subsection{Kubernetes}
 \label{subsec:kubernetes}
 
-While the docker compose offers a basic set of functionalities to bootstrap our application, for a large number of city actors a single computer might not suffice. Here comes Kubernetes in play. Kubernetes \citep{Kubernetes} is an open-source system for automating deployment, scaling and management of containerized applications. It originates from Google and is their third approach on orchestrating microservices, as described in \cite{burns2016borg}.
+While the docker compose offers a basic set of functionalities to bootstrap our application, for a large number of city actors a single computer might not suffice. Here comes Kubernetes in play. Kubernetes \cite{Kubernetes} is an open-source system for automating deployment, scaling and management of containerized applications. It originates from Google and is their third approach on orchestrating microservices, as described in \cite{burns2016borg}.
 
-While Docker-Compose runs on a single machine, Kubernetes is made to run on multiple machines called nodes. It is by default enriched with certain abilities needed to run in this configuration. Made initially to run with LXC and Docker containers \citep{7036275}, it is now a more open system where one can choose the container runtime interface, the container network interface, storage interface, service meshes, etc. from a broad range of vendors. On top of those base offerings, which provides only the backbone of Kubernetes, a distributed application must be built. The desired architecture of a Kubernetes application may consists of many concepts and building bricks. Using \cite{hightower2017kubernetes} as a starting point we can see that there are the most simple and basic units, called pods, which may encompass one or more containers (usually there is one main container and the others, e.g. service mesh supporting side car, are called side cars). There are deployments which gather together pods and rollout or rollback control. There are services which makes pods universally available into the cluster and makes them discoverable, regardless of what node are they running onto and abstracting away failures and upgrades. And then there are replica sets, daemon sets, secrets, config maps and many other resources. On top of those one is able to deploy own custom resource definitions as well as custom controllers. Put together, all those concepts have a rather intimdating allure.
+While Docker-Compose runs on a single machine, Kubernetes is made to run on multiple machines called nodes. It is by default enriched with certain abilities needed to run in this configuration. Made initially to run with LXC and Docker containers \cite{7036275}, it is now a more open system where one can choose the container runtime interface, the container network interface, storage interface, service meshes, etc. from a broad range of vendors. On top of those base offerings, which provides only the backbone of Kubernetes, a distributed application must be built. The desired architecture of a Kubernetes application may consists of many concepts and building bricks. Using \cite{hightower2017kubernetes} as a starting point we can see that there are the most simple and basic units, called pods, which may encompass one or more containers (usually there is one main container and the others, e.g. service mesh supporting side car, are called side cars). There are deployments which gather together pods and rollout or rollback control. There are services which makes pods universally available into the cluster and makes them discoverable, regardless of what node are they running onto and abstracting away failures and upgrades. And then there are replica sets, daemon sets, secrets, config maps and many other resources. On top of those one is able to deploy own custom resource definitions as well as custom controllers. Put together, all those concepts have a rather intimdating allure.
 
 For running the entire traffic simulation onto a Kubernetes cluster we have the basic needs: all services are Docker images. Once each service is correctly described using a yaml format, each consisting of a service and deployment the entire application can be deployed via \textit{kubectl} command. The scaling problem is solved using a similar approach with \textit{docker-compose}. The command will be \textit{\textbf{kubectl scale --replicas=1001 deployment/cityactor}}. As before, with \textit{docker-compose}, it is to be noted the simple approach towards scaling: a core tenet of distributed systems, a property which, as it stands for our use case is quite simple to model. But for other applications, a more sensible approach is needed, as noted by \cite{jogalekar2000evaluating}.
 
@@ -282,9 +269,9 @@ A distributed system has to carefully design the way in which its services commu
 
 A simple and basic idea, noted here only to help on constructing the final proposed solution, is to have each service always located at a certain IP address and a certain port within a network. This means, for example, the city simulator will always be located at 192.168.0.101:7450. The other services which need to be accessed will listen on similar IP addresses and sockets. While this offers a convenient way to have them unified, they are not suitable to run in other environments than a development PC. In this case \textit{docker-compse} will run them such that they are accessible on local host address, i.e. 127.0.0.1:7450. As soon as there are multiple nodes involved this model is not suitable anymore.
 
-Enter the DNS (Domain Name System), the backbone of the entire internet. In its simplest description, avoiding many inherent and nitpicking details, it is a dictionary which keeps track of every registered and easy to memorize name, e.g. \textit{en.wikipedia.com} and the IP addresses where it is located. Any client which would like to access such an name will query first the DNS resolvers and then it will proceed to send a message to the obtained IP address. The most notable interaction of a user with the DNS is the address bar of a browser where the user inserts the name of the site they want to access and while writing the address suggestions are displayed by the browser with the help of recommandation engines \citep{risley2001domain}.
+Enter the DNS (Domain Name System), the backbone of the entire internet. In its simplest description, avoiding many inherent and nitpicking details, it is a dictionary which keeps track of every registered and easy to memorize name, e.g. \textit{en.wikipedia.com} and the IP addresses where it is located. Any client which would like to access such an name will query first the DNS resolvers and then it will proceed to send a message to the obtained IP address. The most notable interaction of a user with the DNS is the address bar of a browser where the user inserts the name of the site they want to access and while writing the address suggestions are displayed by the browser with the help of recommandation engines \cite{risley2001domain}.
 
-When many resources are needed, to serve a great number of users or to support a great number of city actors, a certain service might be so busy with serving data that the compute and memory resources it needs are greater than the underlying hardware is able to support. Therefore it might be located at few addresses at the same time and any client which wants to access it should access the address where there are available compute and memory resources to serve its queries. Ideal would be to abstract or to decouple this information from the client and make it transparent for it. To do this the client needs to know only the service name and a certain "networking" entity should route its request to the appropiate available service. Such a entity could be a DNS authoritative server which, based on the load, availability and latency of the services will route the request to the appropiate node \citep{swildens2006scalable}.
+When many resources are needed, to serve a great number of users or to support a great number of city actors, a certain service might be so busy with serving data that the compute and memory resources it needs are greater than the underlying hardware is able to support. Therefore it might be located at few addresses at the same time and any client which wants to access it should access the address where there are available compute and memory resources to serve its queries. Ideal would be to abstract or to decouple this information from the client and make it transparent for it. To do this the client needs to know only the service name and a certain "networking" entity should route its request to the appropiate available service. Such a entity could be a DNS authoritative server which, based on the load, availability and latency of the services will route the request to the appropiate node \cite{swildens2006scalable}.
 
 Docker and Kubernetes are doing a similar job. They offer a DNS service and according to the load of each node where a service run, a request is rooted to a node which will be able to respond to it. This logic is completely decoupled from the clients. Listings \ref{lst:gocityclientdial} and \ref{lst:cityfrontclientdial} shows how both the city front and a city actor calls the city simulator. All what they do is to use the address, the service name, which was specified in the docker-compose file (listing \ref{lst:dockercompose}). Docker or Kubernetes will do the actual job to route the request to the appropiate node of the service. One thing to note is the difference between the two. A city client will communicate via TCP/IP using the Go default serialization package while the city front use a WebSocket communication technology (add reference to the design choices paragraph) but both of them are transparently routed by Docker.
 
@@ -319,21 +306,30 @@ var startWebsocket = function (callback) {
 }
 \end{lstlisting}
 
-\section{Results}
+\begin{figure*}
+  \includegraphics[width=0.9\linewidth]{ScreenshotWebInterface2.jpg}
+  \centering
+  \caption{Screenshot of the web interface showing the running simulation with a larger number of actors}
+  \label{fig:ScreenshotWebInterface2}
+\end{figure*}
+
+\section{Results and evaluation}
 \label{sec:results}
 
-Figure \ref{fig:ScreenshotWebInterface} shows a screenshot of the web interface discussed in paragraph \ref{subsection:citysimulator}, showing a simulation with less than 20 actors. The web interface is a simple: a html/js only web page (vanilla js) which connects to the city simulator as can be seen in listing \ref{lst:cityfrontclientdial}. The city simulator will send a notification to the web page server each time the density changes for a certain line. It can be that a new or first actor entered a certain line (a list of coordinates which represent a street) or it can be that one or the last actor left a line. The web page will draw any line with a density greater than 0 on top of the map.
+Fig. \ref{fig:ScreenshotWebInterface2} shows a screenshot of the web interface discussed in paragraph \ref{subsection:citysimulator}, showing a running simulation. The web interface is a simple: a html/js only web page (vanilla js) which connects to the city simulator as can be seen in listing \ref{lst:cityfrontclientdial}. The city simulator will send a notification to the web page server each time the density changes for a certain line. It can be that a new or first actor entered a certain line (a list of coordinates which represent a street) or it can be that one or the last actor left a line. The web page will draw any line with a density greater than 0 on top of the map.
 
-The map is sourced from Open Street Map \citep{openstreetmap} and is showing the map zoomed to a specific city, same used by the city actors in their walkings. Thus, whenever a city actor reports that it is traveling across a line and this information arrives at the web interface through the city simulator, the respective line will be immediately drawn into the view.
+The map is sourced from Open Street Map \cite{openstreetmap} and is showing the map zoomed to a specific city, same used by the city actors in their walkings. Thus, whenever a city actor reports that it is traveling across a line and this information arrives at the web interface through the city simulator, the respective line will be immediately drawn into the view.
 
-A laptop used for simulating (MacBook Pro, 16 GB RAM, i5 3.1 GHz) is able to run easily 50 city actors. Above a certain threshold the bottleneck, surprisingly, is not the memory or the cpu but the way docker handles network interfaces. For a larger number of ciy actors a better tool must be used (see paragraph \ref{subsec:kubernetes}). Figure \ref{fig:ScreenshotWebInterface2} shows a simulation with 50 actors running at the same time throughout the city.
+A laptop used for simulating (MacBook Pro, 16 GB RAM, i5 3.1 GHz) is able to run easily 50 city actors. Above a certain threshold the bottleneck, surprisingly, is not the memory or the cpu but the way docker handles network interfaces. For a larger number of ciy actors a better tool must be used (see paragraph \ref{subsec:kubernetes}). Fig \ref{fig:ScreenshotWebInterface2} shows a simulation with 50 actors running at the same time throughout the city.
 
-\section{Enhancements}
+\balance
+
+\section{Conclusions and future work}
 \label{sec:enhancements}
 
-As with all technicl projects, there are a number of enhancements which can be further developed around the concept of simulating a city traffic through actors running in microservices, as presented in this paper. This section will briefly propose few of those details in the following paragraphs.
+As with all technical projects, there are a number of enhancements which can be further developed around the concept of simulating a city traffic through actors running in microservices, as presented in this paper. This section will briefly propose few of those details in the following paragraphs.
 
-As the number of the actors are growing a first bottlneck in the current architecture will be the city simulator. It is a single entity and it represents a single source of truth for the actors. To keep it as single source of truth but at the same time to scale it horizontally means that we need to introduce few additional concepts. In \cite{6847479} a first idea might be of using multiple cloud providers for taking advantage of their available compute resources and also for combining them. This would serve both to the city simulator as well to the swarm of city actors. The other part which remains is to keep the city simulator as a single source of truth by taking advantage of a distributed database. Something similar can be seen in \cite{8509417} where a NoSQL database is used for horizontally scaling. To take advantage of the Kubernetes cluster there are similar horizontally scalable databases which can be built upon. One option is the distribute key-value store used by Kubernetes itself: Etcd datbase \citep{etcd}.
+As the number of the actors are growing a first bottlneck in the current architecture will be the city simulator. It is a single entity and it represents a single source of truth for the actors. To keep it as single source of truth but at the same time to scale it horizontally means that we need to introduce few additional concepts. In \cite{6847479} a first idea might be of using multiple cloud providers for taking advantage of their available compute resources and also for combining them. This would serve both to the city simulator as well to the swarm of city actors. The other part which remains is to keep the city simulator as a single source of truth by taking advantage of a distributed database. Something similar can be seen in \cite{8509417} where a NoSQL database is used for horizontally scaling. To take advantage of the Kubernetes cluster there are similar horizontally scalable databases which can be built upon. One option is the distribute key-value store used by Kubernetes itself: Etcd datbase \cite{etcd}.
 
 A second idea for enhancing the simulation is to make the actors to have a more granular and diverse logic of traversing the city. The solution proposed into this paper is a basic one: an actor has a route between two random points on the map and then it goes on to travel across that route. It can also be made to look for street densities in advance and act accordingly. If a street is too crowded the actor might choose to avoid it and compute a new route around it. A set of actors can be made to always run between same points (to simulate, for example, buses).
 
@@ -343,7 +339,9 @@ A fourth idea is to have contained actors. A bus is an actor. A person is an act
 
 A fifth idea of enhancement is not tied to the way simulation is working but to how it is presented. The web page can display different colors based on the density of a line, offering a visual clue on it. Also it can easily show more information when the cursor is over a point of interest (a street, a junction, etc.). Or it can speed up a past simulation and it can display an animation.
 
-\bibliography{wiki}
+\bibliographystyle{ieeetran}
+\bibliography{references}
+
 \vspace{12pt}
 
 \end{document}
