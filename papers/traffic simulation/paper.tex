@@ -75,18 +75,22 @@ The paper proposes a city traffic software simulation based on actors which run 
 
 A solution which simulates car, pedestrian, etc. traffic in a given city may reap many benefits. It can help understand patterns of traffic and its flow. It can help understand the particularities and pecularities of a city's streets arrangements, together with their junctions. It can help identify bottlenecks. It can help find solutions to rush problems and explore them. But for those areas to be tackled, appropiate methods of simulating traffic must be found and explored. We are proposing a novel way of simulating traffic based on the microservices orchestration concept and using a discrete microscopic logic for the behavior of each actor.
 
-The solution proposed is aiming to design a traffic simulation software which surpasses the computing limits of a single machine and of existing traffic simulation software and runs as a distributed system. In close interplay with the fundamental nature of distributed system (i.e. running a cohesive software on multiple machines) the solution defines entities or actors, modeled as separate microservices, such that the advantage is twofold. First, an entity being a single microservice (and a microservice containing only one entity) they will be easier and natural scheduled and run across more than one machine. Second, the independence of such an entity is also helping in personalize its behavior in randomness and character, offering different ways to model the traffic in a city and allowing more nuanced studies as opposed to macroscopic solutions.
+The solution proposed is aiming to design a traffic simulation software which surpasses the computing limits of a single machine and of existing traffic simulation software and runs as a distributed system. In close interplay with the fundamental nature of distributed system (i.e. running a cohesive software on multiple machines) the solution defines entities or actors, modeled as separate microservices, such that the advantage is twofold. First, an entity being a single microservice (and a microservice containing only one entity) they will be easier and natural scheduled and run across more than one machine. Second, the independence of such an entity is also helping in personalize its behavior in randomness and character, offering different ways to model the traffic in a city and allowing more nuanced studies as opposed to macroscopic solutions. This solution can improve a system where only the global state is computed.
 
 We define a \textbf{(city) actor} as being an independent entity which chose to move between two geographical points within a city. As a character, it can be a car, a pedestrian or a bike. We also define the \textbf{city simulator} as being a single entity (subject to distributed and load balacing services) which keeps data about the city (e.g. streets with city actors on them).
 
-\section{Related work}
+\section{Related works}
 \label{sec:existingsolutions}
 
 Existing solutions have a general distinction of being scattered across a spectrum: macroscopic, mesoscopic or microscopic being milestones across it. This distinction is caused by how the traffic is modeled: on a macroscopic scale like streets or sections of a highway or on microscopic level, focusing on each car and its relation with neighbours. The relation between a car and its neighbours, can also be modeled as microscopic or nanoscopic.
 
-(to rewrite) In the same area of microscopic simulation we can see another proposal from \cite{7004985}. Of a great interest is their ability to feed back in the simulation the data gathered from loop detectors across the portion of highway they are particularly interested in.
+\cite{abm-for-traffic-routing} describes an Agent Based Model (ABM) for improved traffic routing and achieve a system-optimal traffic flow. The similarity with the current paper is that the data is generating at the agent level and the decision remains at the same level, altough there are two layers in total. First is the microscopic layer which consists of all the intelligent agents. The second layer is the macroscopic layer which facilitates the communications between agents. However, the main difference is that in \cite{abm-for-traffic-routing} an agent is able communicate only with the surrounding ones through the use of cellular automata approach. Agents are communicating a handful of data with their co-participants within a certain range: position, velocity, route and type. Using the data they received they are using a transition decision-making model, based on cellular automata, to compute their next move.
 
-In \cite{8569576} the broad idea is to use a discrete event architecture, in which there are logical processes for executing and simulating a number of agents. For a computation intensive aim those processes can be clustered into agent clusters with dependencies between them. The particularity of this proposal is that it crosses the boundaries of a single computing machine and pave a way to distribute the load and information across machines, with certain limitations and challenges.
+In \cite{8569576} the broad idea is to use a discrete event architecture, in which there are logical processes for executing and simulating a number of agents. For a computation intensive aim those processes can be clustered into agent clusters with dependencies between them, but the paper avoids presenting the necessary details on how it would work. The particularity of this proposal is that it crosses the boundaries of a single computing machine and pave a way to distribute the load and information across machines, with certain limitations and challenges.
+
+An approach which is focused on junction modeling is \cite{urban-traffic-sim}. As opposed to the generality of various other related works, \cite{urban-traffic-sim} is focused on two specific and real junctions. The simulation stems from SUMO, using real data acquired from cameras placed in junctions (and analyzed with image processing technologies) and is relaying traffic data to a Matlab instance. The simulation is aiming at evaluating metrics of the traffic which flows through junctions: arrival flow and queue length. This idea is closely related to an enhancement proposed in section \ref{sec:enhancements}.
+
+Altough older, \cite{7004985} deserves to be written about because the real data, from the highway portions of interest, is fed back into the simulation. Loop detectors, scattered across the highways are read and their readings are used to generate simulation models. The model is able to predict car densities across multiple road sections, an ability which the current paper is exploring and is basing its car actor's algorithms onto.
 
 \section{Implementation}
 \label{sec:implementation}
@@ -262,6 +266,13 @@ While Docker-Compose runs on a single machine, Kubernetes is made to run on mult
 
 For running the entire traffic simulation onto a Kubernetes cluster we have the basic needs: all services are Docker images. Once each service is correctly described using a yaml format, each consisting of a service and deployment the entire application can be deployed via \textit{kubectl} command. The scaling problem is solved using a similar approach with \textit{docker-compose}. The command will be \textit{\textbf{kubectl scale --replicas=1001 deployment/cityactor}}. As before, with \textit{docker-compose}, it is to be noted the simple approach towards scaling: a core tenet of distributed systems, a property which, as it stands for our use case is quite simple to model. But for other applications, a more sensible approach is needed, as noted by \cite{jogalekar2000evaluating}.
 
+\begin{figure*}
+  \includegraphics[width=0.9\linewidth]{ScreenshotWebInterface2.jpg}
+  \centering
+  \caption{Screenshot of the web interface showing the running simulation with a larger number of actors}
+  \label{fig:ScreenshotWebInterface2}
+\end{figure*}
+
 \subsection{Networking design}
 \label{subsec:networking}
 
@@ -306,13 +317,6 @@ var startWebsocket = function (callback) {
 }
 \end{lstlisting}
 
-\begin{figure*}
-  \includegraphics[width=0.9\linewidth]{ScreenshotWebInterface2.jpg}
-  \centering
-  \caption{Screenshot of the web interface showing the running simulation with a larger number of actors}
-  \label{fig:ScreenshotWebInterface2}
-\end{figure*}
-
 \section{Results and evaluation}
 \label{sec:results}
 
@@ -320,20 +324,24 @@ Fig. \ref{fig:ScreenshotWebInterface2} shows a screenshot of the web interface d
 
 The map is sourced from Open Street Map \cite{openstreetmap} and is showing the map zoomed to a specific city, same used by the city actors in their walkings. Thus, whenever a city actor reports that it is traveling across a line and this information arrives at the web interface through the city simulator, the respective line will be immediately drawn into the view.
 
-A laptop used for simulating (MacBook Pro, 16 GB RAM, i5 3.1 GHz) is able to run easily 50 city actors. Above a certain threshold the bottleneck, surprisingly, is not the memory or the cpu but the way docker handles network interfaces. For a larger number of ciy actors a better tool must be used (see paragraph \ref{subsec:kubernetes}). Fig \ref{fig:ScreenshotWebInterface2} shows a simulation with 50 actors running at the same time throughout the city.
-
-\balance
+A laptop used for simulating (MacBook Pro, 16 GB RAM, i5 3.1 GHz) is able to run easily 50 city actors. Above a certain threshold the bottleneck, surprisingly, is not the memory or the cpu but the way docker handles network interfaces. For a larger number of city actors a better tool must be used (see paragraph \ref{subsec:kubernetes}). Fig \ref{fig:ScreenshotWebInterface2} shows a simulation with 50 actors running at the same time throughout the city.
 
 \section{Conclusions and future work}
 \label{sec:enhancements}
 
+The concept of modeling or simulating traffic using actors or agents is widespread. The advantages it offers, compared to macroscopic simulation techniques, is that more nuanced data can be obtain, usually by simulating real events and situations more easier when the agents can interact and influence each other. On top of the actor (or agent, or entity) based model, the current paper, compared with the other noted beforehand, has shown the benefits of using today's concepts of distributed systems: containers and orchestration. Those ideas (or concepts or programming frameworks), not novel in their basic traits but novel in the ease of use, enable the scaling of simulation needs across many more physical machines. In parallel with this the code being written do not suffer from leaky abstractions of the distributed nature it runs in. It is kept slim and focused, while the frameworks used are taking care of all the other networking details.
+
+Microservices concept has been presented and together with it the city simulator and the city actor types have been introduced. Their interactions, through a specific protocol, have been presented. Moreover, various other interactions, with supporting roles (routing engine and web page) have been presented: the routing engine can be called by any actor via a REST based API and the web page keeps an open WebSocket connection towards the city simulator to be notified of any change. Design choices, lead by the programming language (Go language) and container tool (Docker) have been discussed, together with their advantages. Networking details and design have been detailed, mostly lead by how the Docker and linux containers landscape works. Kubernetes, as the de facto solution for microservices orchestration was also presented. Finally, a brief description provided the results of a simulation run on a single machine.
+
+\balance
+
 As with all technical projects, there are a number of enhancements which can be further developed around the concept of simulating a city traffic through actors running in microservices, as presented in this paper. This section will briefly propose few of those details in the following paragraphs.
 
-As the number of the actors are growing a first bottlneck in the current architecture will be the city simulator. It is a single entity and it represents a single source of truth for the actors. To keep it as single source of truth but at the same time to scale it horizontally means that we need to introduce few additional concepts. In \cite{6847479} a first idea might be of using multiple cloud providers for taking advantage of their available compute resources and also for combining them. This would serve both to the city simulator as well to the swarm of city actors. The other part which remains is to keep the city simulator as a single source of truth by taking advantage of a distributed database. Something similar can be seen in \cite{8509417} where a NoSQL database is used for horizontally scaling. To take advantage of the Kubernetes cluster there are similar horizontally scalable databases which can be built upon. One option is the distribute key-value store used by Kubernetes itself: Etcd datbase \cite{etcd}.
+As the number of the actors are growing, a first bottlneck in the current architecture will be the city simulator. It is a single entity and it represents a single source of truth for the actors. To keep it as single source of truth but at the same time to scale it horizontally means that we need to introduce few additional concepts. In \cite{6847479} a first idea might be of using multiple cloud providers for taking advantage of their available compute resources and also for combining them. This would serve both to the city simulator as well to the swarm of city actors. The other part which remains is to keep the city simulator as a single source of truth by taking advantage of a distributed database. Something similar can be seen in \cite{8509417} where a NoSQL database is used for horizontally scaling. To take advantage of the Kubernetes cluster there are similar horizontally scalable databases which can be built upon. One option is the distributed key-value store used by Kubernetes itself: Etcd database \cite{etcd}.
 
 A second idea for enhancing the simulation is to make the actors to have a more granular and diverse logic of traversing the city. The solution proposed into this paper is a basic one: an actor has a route between two random points on the map and then it goes on to travel across that route. It can also be made to look for street densities in advance and act accordingly. If a street is too crowded the actor might choose to avoid it and compute a new route around it. A set of actors can be made to always run between same points (to simulate, for example, buses).
 
-A third idea is to add more interactions between actors. It has been discussed that a first interaction is an indirect one: the number of actors on a certain street, a number called density. But there are many more points of interactions. Let's take junctions. The city simulator can model any junction and then it can permit actors to pass or not through it. Then there are pedestrian crossings where different types of actors can meet each other. Or subways access, elevators for them, bus stations, etc.
+A third idea is to add more interactions between actors. It has been discussed that a first interaction is an indirect one: the number of actors on a certain street, a number called density. But there are many more points of interactions. Let's take junctions. The city simulator can model any junction and then it can permit actors to pass or not through it, while at the same time incorporating real data as shown in \cite{urban-traffic-sim}. Then there are pedestrian crossings where different types of actors can meet each other. Or subways access, elevators for them, bus stations, etc.
 
 A fourth idea is to have contained actors. A bus is an actor. A person is an actor. If a person is waiting on a bus station and then it takes a bus, there are two actors, but they are tied together, or contained and are not independent anymore until the actor-person choose to get out of the actor-bus. This means the densities across sidewalkings and bus stations need to be computed accordingly.
 
