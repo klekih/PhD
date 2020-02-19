@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graphhopper-deployment
+  labels:
+    app: graphhopper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: graphhopper
+  template:
+    metadata:
+      labels:
+        app: graphhopper
+    spec:
+      containers:
+      - name: graphhopper
+        image: tomabecea/graphhopper
+        ports:
+        - containerPort: 8989
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: graphhopper
+spec:
+  selector:
+    app: graphhopper
+  ports:
+    - protocol: TCP
+      port: 8989
+      targetPort: 8989

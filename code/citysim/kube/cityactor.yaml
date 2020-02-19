@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cityactor-deployment
+  labels:
+    app: cityactor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cityactor
+  template:
+    metadata:
+      labels:
+        app: cityactor
+    spec:
+      containers:
+      - name: cityactor
+        image: tomabecea/cityactor
+        ports:
+        - containerPort: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cityactor
+spec:
+  selector:
+    app: cityactor
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
