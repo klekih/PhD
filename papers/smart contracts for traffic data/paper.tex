@@ -1,0 +1,90 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{balance}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Smart contracts for handling city traffic information}
+
+\author{\IEEEauthorblockN{1\textsuperscript{st} Toma Becea}
+    \IEEEauthorblockA{\textit{Automation and Computer Science Faculty} \\
+    \textit{Technical University of Cluj-Napoca}\\
+            Cluj-Napoca, Romania \\
+            tomabecea@pm.me}
+    \and
+    \IEEEauthorblockN{2\textsuperscript{nd} Honoriu Valean}
+    \IEEEauthorblockA{\textit{Automation and Computer Science Faculty} \\
+    \textit{Technical University of Cluj-Napoca}\\
+            Cluj-Napoca, Romania \\
+            Honoriu.Valean@aut.utcluj.ro}
+}
+
+\maketitle
+
+\begin{abstract}
+    When deployments of new versions of a piece of software are needed, their introduction into production might create disruptions for end users. This papers explores the concept of traffic splitting where a new version is released and then gradually deployed to the users. The graduality means that both versions are up at the same time and the new one will initially receive only a small percentage (10\%) of traffic. If the traffic is deemed to have same error rate as the old version then the splitting rules are increased. Finally, the old version will receive no traffic and can be removed from the system.
+\end{abstract}
+
+\begin{IEEEkeywords}
+    software trials, software deployments, microservices, traffic splitting, Kubernetes, Linkerd
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+\subsection{Terms}
+\paragraph{Release}
+\paragraph{Deploy}
+\paragraph{Error rate}
+
+\section{Current state}
+
+\section{Solution}
+
+\section{Conclusions}
+
+\begin{thebibliography}{00}
+
+    \bibitem{b1} Hall, Richard S., Dennis Heimbigner, and Alexander L. Wolf. "A cooperative approach to support software deployment using the software dock." Proceedings of the 21st international conference on Software engineering. 1999.
+
+    \bibitem{b2} Xuemei Zhang, Hoang Pham. "Software field failure rate prediction before software deployment, Journal of Systems and Software", Volume 79, Issue 3, 2006, Pages 291-300, ISSN 0164-1212.
+
+    \bibitem{b3} A. Dearle. "Software Deployment, Past, Present and Future," Future of Software Engineering (FOSE '07), Minneapolis, MN, 2007, pp. 269-284. doi: 10.1109/FOSE.2007.20.
+
+    \bibitem{b4} M. Conway, \href{https://en.wikipedia.org/wiki/Conway%27s_law}{Wikpedia, Conway's law page}
+
+    \bibitem{b5} Thones, Johannes. "Microservices." IEEE software 32.1 (2015): 116-116.
+
+    \bibitem{b6} Villamizar, Mario, et al. "Evaluating the monolithic and the microservice architecture pattern to deploy web applications in the cloud." 2015 10th Computing Colombian Conference (10CCC). IEEE, 2015.
+
+    \bibitem{b7} Sheikh, Hammad, Ángel Gómez, and Scott Atran. "Empirical evidence for the devoted actor model." Current Anthropology 57.S13 (2016): S204-S209.
+
+    \bibitem{b8} Docker. \href{https://www.docker.com}{Docker website}
+
+    \bibitem{b9} Kubernetes. \href{https://kubernetes.io}{Kubernetes website}
+
+    \bibitem{b10} Burns, Brendan, et al. "Borg, omega, and kubernetes." Queue 14.1 (2016): 70-93.
+
+    \bibitem{b11} CNCF. \href{https://www.cncf.io}{CNCF website}
+
+    \bibitem{b12} Linux network namespaces. \href{https://www.systutorials.com/docs/linux/man/7-network_namespaces/}{Linux Man Pages}
+
+    \bibitem{b13} Linux IP Tables. \href{https://www.systutorials.com/docs/linux/man/8-iptables/}{Linux Man Pages}
+
+    \bibitem{b14} OSI Model. \href{https://en.wikipedia.org/wiki/OSI_model}{Wikipedia page for OSI Model}
+
+    \bibitem{b15} Li, Wubin, et al. "Service Mesh: Challenges, state of the art, and future research opportunities." 2019 IEEE International Conference on Service-Oriented System Engineering (SOSE). IEEE, 2019.
+
+    \bibitem{b16} Linkerd. \href{https://linkerd.io}{Linkerd website}
+
+\end{thebibliography}
+
+\end{document}

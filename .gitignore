@@ -8,4 +8,5 @@
 **/*.fls
 **/*.bbl
 **/*.blg
+**/*.out
 .DS_Store
