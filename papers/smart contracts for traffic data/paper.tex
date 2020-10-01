@@ -31,11 +31,13 @@
 \maketitle
 
 \begin{abstract}
-    When deployments of new versions of a piece of software are needed, their introduction into production might create disruptions for end users. This papers explores the concept of traffic splitting where a new version is released and then gradually deployed to the users. The graduality means that both versions are up at the same time and the new one will initially receive only a small percentage (10\%) of traffic. If the traffic is deemed to have same error rate as the old version then the splitting rules are increased. Finally, the old version will receive no traffic and can be removed from the system.
+
+    Blockchain technologies are becoming increasingly complex and thus are tackling more and more various use cases than decentralised finance which was the sole purpose of Bitcoin, first successful blockchain. Or they are tackling more and more use cases and thus their inherent complexity increases. Either way, one of the untouched places was IoT realm. Due to natural IoT constraints, like limited processing power and high volume of data blockchain technologies have stayed separately. However, the Ethereum 2.0 and IOTA are two distributed ledger technologies with two different approaches of handling a high volume of transactions without requiring specialized hardware. The current paper is aiming to explore the possibilites of those two technologies through the lens of a concrete use case: transfering city traffic information between traffic participants and reaching consensus towards optimizing the traffic. The data to be transferred has specific needs and formats. The traffic optimization consensus has to take into account various metrics and goals. Those two aspects need to be modeled on the exact blockchain technology via smart contracts.
+
 \end{abstract}
 
 \begin{IEEEkeywords}
-    software trials, software deployments, microservices, traffic splitting, Kubernetes, Linkerd
+    
 \end{IEEEkeywords}
 
 \section{Introduction}
@@ -54,36 +56,6 @@
 \begin{thebibliography}{00}
 
     \bibitem{b1} Hall, Richard S., Dennis Heimbigner, and Alexander L. Wolf. "A cooperative approach to support software deployment using the software dock." Proceedings of the 21st international conference on Software engineering. 1999.
-
-    \bibitem{b2} Xuemei Zhang, Hoang Pham. "Software field failure rate prediction before software deployment, Journal of Systems and Software", Volume 79, Issue 3, 2006, Pages 291-300, ISSN 0164-1212.
-
-    \bibitem{b3} A. Dearle. "Software Deployment, Past, Present and Future," Future of Software Engineering (FOSE '07), Minneapolis, MN, 2007, pp. 269-284. doi: 10.1109/FOSE.2007.20.
-
-    \bibitem{b4} M. Conway, \href{https://en.wikipedia.org/wiki/Conway%27s_law}{Wikpedia, Conway's law page}
-
-    \bibitem{b5} Thones, Johannes. "Microservices." IEEE software 32.1 (2015): 116-116.
-
-    \bibitem{b6} Villamizar, Mario, et al. "Evaluating the monolithic and the microservice architecture pattern to deploy web applications in the cloud." 2015 10th Computing Colombian Conference (10CCC). IEEE, 2015.
-
-    \bibitem{b7} Sheikh, Hammad, Ángel Gómez, and Scott Atran. "Empirical evidence for the devoted actor model." Current Anthropology 57.S13 (2016): S204-S209.
-
-    \bibitem{b8} Docker. \href{https://www.docker.com}{Docker website}
-
-    \bibitem{b9} Kubernetes. \href{https://kubernetes.io}{Kubernetes website}
-
-    \bibitem{b10} Burns, Brendan, et al. "Borg, omega, and kubernetes." Queue 14.1 (2016): 70-93.
-
-    \bibitem{b11} CNCF. \href{https://www.cncf.io}{CNCF website}
-
-    \bibitem{b12} Linux network namespaces. \href{https://www.systutorials.com/docs/linux/man/7-network_namespaces/}{Linux Man Pages}
-
-    \bibitem{b13} Linux IP Tables. \href{https://www.systutorials.com/docs/linux/man/8-iptables/}{Linux Man Pages}
-
-    \bibitem{b14} OSI Model. \href{https://en.wikipedia.org/wiki/OSI_model}{Wikipedia page for OSI Model}
-
-    \bibitem{b15} Li, Wubin, et al. "Service Mesh: Challenges, state of the art, and future research opportunities." 2019 IEEE International Conference on Service-Oriented System Engineering (SOSE). IEEE, 2019.
-
-    \bibitem{b16} Linkerd. \href{https://linkerd.io}{Linkerd website}
 
 \end{thebibliography}
 
