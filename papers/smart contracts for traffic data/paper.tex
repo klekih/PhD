@@ -1,16 +1,45 @@
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
-% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
 \usepackage{graphicx}
 \usepackage{textcomp}
-\usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{balance}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+        
+\lstset{style=mystyle}
+
 \begin{document}
 
 \title{Smart contracts for handling city traffic information}
@@ -32,18 +61,51 @@
 
 \begin{abstract}
 
-    Blockchain technologies are becoming increasingly complex and thus are tackling more and more various use cases than decentralised finance which was the sole purpose of Bitcoin, first successful blockchain. Or they are tackling more and more use cases and thus their inherent complexity increases. Either way, one of the untouched places was IoT realm. Due to natural IoT constraints, like limited processing power and high volume of data blockchain technologies have stayed separately. However, the Ethereum 2.0 and IOTA are two distributed ledger technologies with two different approaches of handling a high volume of transactions without requiring specialized hardware. The current paper is aiming to explore the possibilites of those two technologies through the lens of a concrete use case: transfering city traffic information between traffic participants and reaching consensus towards optimizing the traffic. The data to be transferred has specific needs and formats. The traffic optimization consensus has to take into account various metrics and goals. Those two aspects need to be modeled on the exact blockchain technology via smart contracts.
+    Blockchain technologies have been initially useful for decentralised finance transactions. Due to limitations in scaling, both for number of transcations and magnitude of stored data, other use cases have remained outside of their reach. However, recent developments of Ethereum 2.0 and IoT focused ledger technology IOTA are tackling those two limitations. We are analyzing the suitability of their smart contracts platform for the concrete use case of a decentralized system where participants within a city traffic are sharing traffic data among themselves and are reaching consensus for optimizing the traffic. The particular criteria for this analysis is the language support for structures of grouped variables, 
 
 \end{abstract}
 
 \begin{IEEEkeywords}
+
+    blockhain, ethereum, iota
     
 \end{IEEEkeywords}
 
 \section{Introduction}
 
-\subsection{Terms}
-\paragraph{Release}
+    Blockchain technologies are becoming increasingly complex and thus are tackling more and more various use cases than decentralized finance which was the sole purpose of Bitcoin, first successful blockchain. Or they are tackling more and more use cases and thus their inherent complexity increases. Either way, one of the difficult for them places was IoT realm. Due to ineherent IoT constraints, like limited processing power and high volume of data, blockchain technologies have stayed separately. However, the Ethereum 2.0 and IOTA are two distributed ledger technologies with two different approaches of handling a high volume of transactions without requiring specialized hardware like GPU or ASIC. The current paper is aiming to explore the possibilites of those two technologies through the lens of a concrete use case: transfering city traffic information between traffic participants and reaching consensus towards optimizing the traffic. The data to be transferred has specific needs and formats. The traffic optimization consensus has to take into account various metrics and goals. Those two aspects need to be modeled on the blockchain technology via smart contracts.
+
+\subsection{Criteria}
+\paragraph{Data format}
+
+Following the 
+\begin{lstlisting}[caption=Go enumerations for messaging, label=lst:goactorreports]
+    const (   
+        // ReportOnTheLine is the report sent by one agent to
+        // notify the city that he is currently advancing
+        // through one line.
+        ReportOnTheLine = iota
+        
+        // ReportOffFromLine is the report sent by one agent to
+        // notify the city that he has finished advancing through
+        // one line and has departed from it.
+        ReportOffFromLine = iota
+    )
+        
+    const (
+        // SendReport is a message passed from an actor to the city
+        // indicating its status (e.g. location).
+        SendReport = iota
+        
+        // AskForLine is a message passed from an actor to the city.
+        // A response is awaited.
+        AskForLine = iota
+        
+        // RespondWithLine is a message passed from the city to
+        // an actor and it contains line data.
+        RespondWithLine = iota
+    )
+    \end{lstlisting}
 \paragraph{Deploy}
 \paragraph{Error rate}
 
@@ -55,7 +117,7 @@
 
 \begin{thebibliography}{00}
 
-    \bibitem{b1} Hall, Richard S., Dennis Heimbigner, and Alexander L. Wolf. "A cooperative approach to support software deployment using the software dock." Proceedings of the 21st international conference on Software engineering. 1999.
+    \bibitem{b1} Toma Becea and Honoriu Valean. “A Microservices based Approach for City Traffic Simulation”. \\ International Journal of Advanced Computer Science and Applications(IJACSA), 11(2), 2020. \\ http://dx.doi.org/10.14569/IJACSA.2020.0110209
 
 \end{thebibliography}
 
