@@ -5,12 +5,48 @@
 \usepackage{amsmath}
 \usepackage{apacite}
 \usepackage{natbib}
-\usepackage{listings}
-\usepackage{graphicx}
+\usepackage{url}
+\usepackage{amsmath,amssymb,amsfonts}
 
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+
+\graphicspath{ {.} }
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\usepackage{balance}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+    }
+
+    \lstset{style=mystyle}
+    
 \bibliographystyle{apacite}
 \pagestyle{myheadings}
-
 \title{ City traffic, IoT and Blockchain technologies }
 \author{Toma Becea}
 
@@ -22,13 +58,106 @@
 
 \section{Introduction}
 
+    Following previous chapter, about how traffic in a city can be modeled and analyzed, we step forward into the realm of IoT and Blockchain technologies. Those two terms, IoT and Blockchain, are only buzz words. Or they are so general, so loosely defined that we can treat them as marketing or advertising terms. Hence, we have to define them for our specific purpose.
+
+    Internet of Things is term coined to express the multitude of devices or physical objects which are connected, in various ways, to the public internet. They are transmitting data, are requesting data from a central server, one from another or in collaboration with a mesh of IoT devices. An IoT device has something to "offer". It is usually a specific job it has to do by being provided with sensors and a alogrithmical method of sending data. On the other hand it can be also used for automation jobs where not only it is able to send data to other systems but it can act based upon the data it acquires or it can receive various commands to execute from other IoT devices or systems. In the context of the present thesis an IoT device can be considered an actor which is travelling thorugh the city and it reports data or it uses other actor's data.
+
+    Blockchain are a set of emerging technologies which were first aimed at decentralizing financial transactions. Bitcoin cryptocurrency\citep{SatoshiNakamoto}, first of its kind and still the most popular, created a global distributed and decentralized peer to peer system where financial transactions (sending money from one account or wallet to another one) are taking place without relying to a central party or a bank for shielding against double spend \citep{DoubleSpend}. It also sparked a cornucopia of other cryptocurrencies, each with its own distinctive feature. Few of them, worth to be noted because they will be analyzed further in this thesis, are Ethereum, Hyperledger Fabric and IOTA.
+
 \section{Abstract}
 
-\section{}
-\label{sec:microservicesbasedapproachtrafficsim}
+    This chapter is aiming to lay the ground on how we intend to bring the city traffic infrastructure from previous chapter and its needs into a blockchain technology. The two worlds, two very different paradigms, can be bridged together: IoT and Blockchain. The traffic of a city is an inherent IoT application. The actors, regardless of their type (cars, bikes, pedestrians), might have limited power consumption, might have intermittent internet conectivity and can be offline for long periods of time. Those constraints led to design an IoT solution for their communications. On the other side a Blockchain technology has needs which, at first sight, are in contrast with what an IoT device can do: proof of work is the first reason as it requires a great amount of power. Then the continuous online presence is needed, to participate in the blockchain network and stay up to date. Last, but not the least, the smart contracts nature of each Blockchain requires a different paradigm, a shift in how business logic are written. This comes with its own set of opportunities and limitations. To bring those areas together gaps must be identified in detail and bridges must be built over them. The target is to discuss those areas for two blockchains networks: Ethereum 2.0 and IOTA.
 
-\section{}
-\label{sec:citytrafficoptimizations}
+\section{Introduction}
+\label{sec:sec}
+
+    The journey of this chapter follows the items below. We first establish what IoT means for the city traffic simulation from chapter one. Several concepts from it will be repeated but from a different perspective. This happens in section \ref{sec:IoTNature}. Afterwards few aspects from Ethereum 2.0 blockchain will be discussed, in section \ref{sec:EthereumNature}. Same perspective but with a different blockcahin will be in section \ref{sec:IOTABlockchainNature}. Both of them have various proposals around smart contracts executioon and this will be discussed in section \ref{sec:SmartContracts}. A big part of every distributed ledger is the way it has designed its Proof of Work or Proof of Stake. Those will be discussed in section \ref{sec:PoWandPoS}. Finally, the two worlds will be connected using few proposals in section \ref{sec:GapsBridges}.
+
+    \begin{itemize}
+        \item The IoT nature of the actors from a city traffic
+        \item The Blockchain nature of Ethereum 2.0
+        \item The Blockchain nature of IOTA
+        \item Smart contracts
+        \item Proof of Work and Proof of Stake
+        \item Gaps and bridges
+        \item Conclusion
+    \end{itemize}
+
+
+\section{The IoT nature of the actors from a city traffic}
+\label{sec:IoTNature}
+
+    IoT is a very general concept with many dimensions. Across the type of applications dimension there are several domains like, but not limited to, consumer applications (e.g. smart home), medical and healthcare, industrial (e.g. agriculture), military, etc. On the dimension of physical connection, they can use bluetooth, near-field communication or wifi. Therefore the effort of defining the general nature of IoT is quite extensive and doesn't fit into current subject.
+
+    What we can achieve here, however, is to define the nature of the actors participating in a traffic city (or in a simulation, see previous chapter). The walkthrough of this has to reach few points:
+
+    \begin{itemize}
+        \item Hardware
+        \item Communication layer
+        \item Communication style
+        \item Security
+        \item Anonimity
+        \item Interoperability
+    \end{itemize}
+
+    \paragraph{Hardware} Traditionally a person which travels within a city is expected to have a standalone GPS or a smartphone with GPS abilities and a suitable application (e.g. Waze). For our purposes the hardware is a less important choice. What matters is that the software running is able to send data, receive data and act accordingly for informing the user. Given the decentralized architecture this thesis is going towards, a classic navigation application (like Waze, which depends on a server to be fully functionally) is less likely to fit. Therefore a custom software stack needs to run. With respect to how much powerfull the navigation device is, there is a plethora of options, ranging from low energy to high performing CPUs and GPUs. This enables the navigation device to be able to run smart contracts and proof of work activities. \ref{sec:PoWandPoS} will talk more on this subject.
+
+    \paragraph{Communication layer} The first assumption is that the device is able to send and receive data via a TCP based protocol. The second assumption is that the bandwith is enough to send and receive packets which have JSON format.
+
+    \paragraph{Communication style} To explain the style of communications for an actor the best way is to illustrate it using two JSON examples. Following \cite{MicroservicesCityTrafficSimulation} paper about a microservices approach for city traffic simulation, we take and use the data defined there for defining the communication style. Listings \ref{lst:jsonClientEnums} shows the JSON schema for a report which an actor sends (in the cited paper it sends this message to a central server but the intention of the thesis is to have a decentralized architecture and no central servers). \textit{ReportOnTheLine} is the report sent by one agent to notify the city that he is currently advancing through one line. \textit{ReportOffFromLine} is the report sent by one agent to notify the city that he has finished advancing through one line and has departed from it. \textit{SendReport} is a message passed from an actor to the city indicating its status (e.g. location). \textit{AskForLine} is a message passed from an actor to the city. A response is awaited. \textit{RespondWithLine} is a message passed from the city to an actor and it contains line data.
+
+    \begin{lstlisting}[caption=JSON schema with enumerations for messaging, label=lst:jsonClientEnums]
+    "ReportType": {
+        "type": "array",
+        "items": {
+            "type": "string",
+            "enum": ["ReportOnTheLine", 
+                        "ReportOffFromLine"]
+        }
+    },
+    
+    "MessageType": {
+        "type": "array",
+        "items": {
+            "type": "string",
+            "enum": ["SendReport",
+                        "AskForLine", 
+                        "RespondWithLine"]
+        }
+    }            
+    \end{lstlisting}
+
+    \begin{lstlisting}[caption=JSON top level struct (envelope), label=lst:jsonEnvelope]        
+    "Envelope": {
+        "MessageType": "SendReport
+        "Payload": {
+            "ReportType": "ReportOffFromLine",
+            "Line": [ { 45.64354, 34.6768 }, 
+                        { 45.66543, 34.6722 }
+            ]
+        }
+    }
+    \end{lstlisting}
+
+    The global format of such a JSON needs the ability to transport any type of message. Therefore the listing \ref{lst:jsonEnvelope} represents such a message.
+
+\section{The Blockchain nature of Ethereum 2.0}
+\label{sec:EthereumNature}
+
+\section{The Blockchain nature of IOTA}
+\label{sec:IOTABlockchainNature}
+
+\section{Smart contracts}
+\label{sec:SmartContracts}
+
+\section{Proof of Work and Proof of Stake}
+\label{sec:PoWandPoS}
+
+\section{Gaps and Bridges}
+\label{sec:GapsBridges}
+
+\section{Conclusion}
+\label{sec:Conclusion}
 
 \bibliography{wiki}
 
