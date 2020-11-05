@@ -67,10 +67,10 @@
 
 \section{Abstract}
 
-    This chapter is aiming to lay the ground on how we intend to bring the city traffic infrastructure from previous chapter and its needs into a blockchain technology. The two worlds, two very different paradigms, can be bridged together: IoT and Blockchain. The traffic of a city is an inherent IoT application. The actors, regardless of their type (cars, bikes, pedestrians), might have limited power consumption, might have intermittent internet conectivity and can be offline for long periods of time. Those constraints led to design an IoT solution for their communications. On the other side a Blockchain technology has needs which, at first sight, are in contrast with what an IoT device can do: proof of work is the first reason as it requires a great amount of power. Then the continuous online presence is needed, to participate in the blockchain network and stay up to date. Last, but not the least, the smart contracts nature of each Blockchain requires a different paradigm, a shift in how business logic are written. This comes with its own set of opportunities and limitations. To bring those areas together gaps must be identified in detail and bridges must be built over them. The target is to discuss those areas for two blockchains networks: Ethereum 2.0 and IOTA.
+    This chapter is aiming to lay the ground on how we intend to bring the city traffic infrastructure from previous chapter and its needs into a blockchain technology. The two worlds, two very different paradigms, can be bridged together: IoT and Blockchain. The traffic of a city is an inherent IoT application. The actors, regardless of their type (cars, bikes, pedestrians), might have limited power consumption, might have intermittent internet conectivity and can be offline for long periods of time. Those constraints led to design an IoT solution for their communications. On the other side, a Blockchain technology has needs which, at first sight, are in contrast with what an IoT device can do: proof of work is the first reason as it requires a great amount of power. Then the continuous online presence is needed, to participate in the blockchain network and stay up to date. Last, but not the least, the smart contracts nature of each Blockchain requires a different paradigm, a shift in how business logic are written. This comes with its own set of opportunities and limitations. To bring those areas together gaps must be identified in detail and bridges must be built over them. The target is to discuss those areas for two blockchains networks: Ethereum 2.0 and IOTA. Section \ref{sec:GapsBridges} will go into more detail.s
 
-\section{Introduction}
-\label{sec:sec}
+\section{Contents}
+\label{sec:Contents}
 
     The journey of this chapter follows the items below. We first establish what IoT means for the city traffic simulation from chapter one. Several concepts from it will be repeated but from a different perspective. This happens in section \ref{sec:IoTNature}. Afterwards few aspects from Ethereum 2.0 blockchain will be discussed, in section \ref{sec:EthereumNature}. Same perspective but with a different blockcahin will be in section \ref{sec:IOTABlockchainNature}. Both of them have various proposals around smart contracts executioon and this will be discussed in section \ref{sec:SmartContracts}. A big part of every distributed ledger is the way it has designed its Proof of Work or Proof of Stake. Those will be discussed in section \ref{sec:PoWandPoS}. Finally, the two worlds will be connected using few proposals in section \ref{sec:GapsBridges}.
 
@@ -178,15 +178,35 @@
 
     Bitcoin is capable only of a limited, non Turing-complete ability of executing smart contracts. Therefore its main purpose remained transfer of money. Many other blockchain technologies, most notable being Ethereum, has been designed from the ground up to have support for smart contracts. Ethereum has a virtual machine, called Ethereum Virtual Machine (EVM). The EVM takes an input from the current Ethereum state and produces an output or a transaction. It is a stack machine with a depth of 1024 items, where each item is a 256-bit word. Every client implementation has an EVM implementation because each client has to be able to execute smart contracts. EVM have those smart contracts being \say{on-chain}. This means they are part of the core protocol. Execution and validation are being made by all nodes in the protocol. This offers a good security architecture and as much as the network grows it will improve the security even more. Smart contracts, which are one of the two types of Ethereum accounts (the other being the usual user accounts), are able to transfer tokens from their account without providing the usual signature of an user account. But there also disadvantages. All nodes have to execute a smart contracts and this leads to a lack of scalability. Their execution cost money (gas in Ethereum paralance). Thus the second type of smart contracts appear in sight: \say{off-chain}. The main difference is that not all nodes are mandated to execute them and thus the consensus is not part of the core protocol. The advantages are first the scalability because not all the nodes need to take part into the consensus. The greatest disadvantage is the lack of privacy (hence the work of \cite{PrivacyAwareIOTALedger} to improve it).
 
-    What are the roles of smart contracts, though? Ever since the blockchain gained wider adoption the insufficiency of Bitcoin, first one of its kind and still the most successfull, has been an obstacle for implementing other types of transactions than the simple money transfer. Therefore other blockchain have started to be designed from the ground up to allow more complex logic. Examples are plenty: decentralized voting, assets transfer and ownership, etc.
+    What are the roles of smart contracts, though? Ever since the blockchain gained wider adoption the insufficiency of Bitcoin, first one of its kind and still the most successfull, has been an obstacle for implementing other types of transactions than the simple money transfer. Therefore other blockchain have started to be designed from the ground up to allow more complex logic. Examples are plenty: decentralized voting, assets transfer and ownership, etc. Ethereum is the most popular offering with a smart contracts (see section \ref{sec:EthereumNature}). IOTA is another one and is tailored for the IoT world.
 
-\section{Proof of Work and Proof of Stake}
-\label{sec:PoWandPoS}
+    % some papers from 'papers 2' folder can be added here
 
-% good behavior
+% \section{Proof of Work and Proof of Stake}
+% \label{sec:PoWandPoS}
+
+    % some other papers from 'papers 2' folder
 
 \section{Gaps and Bridges}
 \label{sec:GapsBridges}
+
+    \paragraph{Serverless} We found out, already, that there is no central server into the sight of a blockchain or a distributed ledger technology. Therefore, our solution designed in chapter one, will need to undergo drastic modifications. There was already o similar idea which could help us on this matter, proposed by \cite{ApproachesToFrontEnd}. The frontend side will remain the actor's interaction with the user. An example can be an Android application running on the phone or an Android application running on a car's dashboard. The backend might have different configurations:
+
+    \begin{itemize}
+        \item Backend is running on the same machine with the frontend. For a mobile phone it might not be a good idea if the resources needed for it will drain batteries and consume data plans. For an application running on a car's dashboard, this can be an option.
+        \item Backend is running on other machine than the one where the frontend is running. It can be a user's machine, running somwhere at home or in the cloud or it can be a paid one, a Software as a Service offering, run by a third party on behalf of the user. The core principle is that heavy computations, if necessary for Ethereum, for example, are handed over to a more powerful system.
+        \item Backend is not running at all anywhere. Instead, all the interactions an actor need are sent to miners of a Blockchain. Miners will be responsible for gathering data, formulating responses and sending answers back to the users. All the interactions may be recorded on the ledger. The frontend will get its data from the ledger as soon as a miner adds it and is validated by the network.
+    \end{itemize}
+
+    \paragraph{Data on ledger} Having so many interactions between an actor's need and the ledger, there is the legitimate question of which data should be recorded forever on the ledger and which should not.
+
+    \paragraph{Miners' decisions} The miner will decide the path the actor will travel
+
+    \paragraph{Local ledgers} Coordinators, local 'servers' might exist for each city or region
+
+    \paragraph{Actor role} What is an actor's role on the blockchain
+
+    \paragraph{Third party observers} Participants on the network, only for observing
 
 \section{Conclusion}
 \label{sec:Conclusion}
